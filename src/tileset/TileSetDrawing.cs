@@ -8,11 +8,22 @@ namespace TileMapper
     {
 
         // Calculate the tile dimensions in the X and Y directions.
-        public Tuple<int, int> GetTileDimensions()
+        public Tuple<uint, uint> GetTileDimensions()
         {
-            int availableWidth = _texture.width - TileInitialSpacingX;
-            int availableHeight = _texture.height - TileInitialSpacingY;
-            return new Tuple<int, int>(availableWidth / (TileWidth + TilePaddingX), availableHeight / (TileHeight + TilePaddingY));
+
+            // X size.
+            uint availableWidth = (uint)_texture.width - TileInitialSpacingX;
+            uint numTilesX = availableWidth / ((uint)TileWidth + TilePaddingX);
+            if ((availableWidth % (TileWidth + TilePaddingX)) >= TileWidth) numTilesX++;
+
+            // Y size.
+            uint availableHeight = (uint)_texture.height - TileInitialSpacingY;
+            uint numTilesY = availableHeight / ((uint)TileHeight + TilePaddingY);
+            if ((availableHeight % (TileHeight + TilePaddingY)) >= TileHeight) numTilesY++;
+
+            // Put it all together.
+            return new Tuple<uint, uint>(numTilesX, numTilesY);
+
         }
 
         // Get source rectangle from tile ID.
@@ -34,8 +45,14 @@ namespace TileMapper
 
         }
 
+        // Get ID from a tile position in the grid.
+        public uint GetID(uint x, uint y)
+        {
+            return y * TileWidth + x;
+        }
+
         // Draw a tile to a given position.
-        public void Draw(float x, float y, uint id, float scale)
+        public void Draw(float x, float y, uint id, float scale = 1.0f)
         {
 
             // Get source rectange and check if invalid.

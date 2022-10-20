@@ -4,7 +4,7 @@ namespace TileMapper
 {
 
     // Details of a tileset that change behavior.
-    public partial class TileSet
+    public partial class TileSet : IDisposable
     {
 
         // Name of the tileset.
@@ -41,7 +41,7 @@ namespace TileMapper
         public TileSet(string imagePath, string name)
         {
             Name = name;
-            _imageExt = Path.GetExtension(imagePath).Replace(".", "");
+            _imageExt = Path.GetExtension(imagePath);
             _imageData = File.ReadAllBytes(imagePath);
             _texture = Raylib.LoadTexture(imagePath);
         }
@@ -54,8 +54,8 @@ namespace TileMapper
             _texture = Raylib.LoadTexture(imagePath);
         }
 
-        // Unload the tileset.
-        ~TileSet()
+        // Cleanup all resources used by tileset.
+        public void Dispose()
         {
             Raylib.UnloadTexture(_texture);
         }
