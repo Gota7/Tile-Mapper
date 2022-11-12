@@ -27,6 +27,8 @@ namespace TileMapper {
         
         TileSet set = new TileSet("./grass.tms");
 
+        bool sizeSet = false;
+
         public TileSelector(/*TileSet t, int unit*/) : base(260, 50) { 
             var dim = set.GetTileDimensions();
             uint tileNum = dim.Item1*dim.Item2;
@@ -48,7 +50,10 @@ namespace TileMapper {
 
         public override void DrawUI() {
 
+            if (!sizeSet) {
             ImGui.SetNextWindowSize(new Vector2(trueWidth + 8 + 8, trueHeight + 27 + 8));
+            sizeSet = true;
+            }
 
             ImGui.Begin("Tile Selector");
 
@@ -97,6 +102,10 @@ namespace TileMapper {
             for (int i = 0; i < tileList.Length; i++) {
 
                 set.Draw(row*UnitSize + row*TileGap, col*UnitSize+RowGap*col, (uint)tileList[i], scale);
+                
+                //draw border around selected tile
+                if (TileSelctedID == tileList[i])
+                    Raylib.DrawRectangleLinesEx(new Rectangle(row*UnitSize + row*TileGap,col*UnitSize+RowGap*col,UnitSize,UnitSize), 1f, Color.BLACK);
 
                 row++;
                 if(row >= TilesPerRow) {

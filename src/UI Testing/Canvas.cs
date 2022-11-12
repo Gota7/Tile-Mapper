@@ -22,6 +22,8 @@ namespace TileMapper {
 
         float scaleX, scaleY; //scale = currernt/true
 
+        bool sizeSet = false;
+
 
         //the width and height should be that of the tile map
         public Canvas(TileSelector ts) : base(15*30,15*30/*must be true size*/) {
@@ -47,7 +49,11 @@ namespace TileMapper {
         public override void DrawUI() {
 
             //canvas is 600x600, other window elements are 8x27x8x8 found from GetWindowContentRegionMin
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(trueWidth + 8 + 8,trueHeight + 27 + 8));
+
+            if (!sizeSet){
+                ImGui.SetNextWindowSize(new System.Numerics.Vector2(trueWidth + 8 + 8,trueHeight + 27 + 8));
+                sizeSet = true;
+            }
 
             ImGui.Begin("Canvas", ref _open);
 
