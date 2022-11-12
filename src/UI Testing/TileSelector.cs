@@ -25,7 +25,7 @@ namespace TileMapper {
 
         private int[] tileList;
         
-        TileSet set = new TileSet("./TestTileset.tms");
+        TileSet set = new TileSet("./grass.tms");
 
         public TileSelector(/*TileSet t, int unit*/) : base(260, 50) { 
             var dim = set.GetTileDimensions();
@@ -37,6 +37,13 @@ namespace TileMapper {
             trueWidth = TilesPerRow*UnitSize + (TilesPerRow-1)*TileGap;
             trueHeight = rowNum*UnitSize + (rowNum-1)*RowGap;
             this.ResizeRenderTarget(trueWidth, trueHeight);
+
+            for (uint i = 0, count = 0; i < dim.Item1; i++) {
+                for (uint j = 0; j < dim.Item2; j++) {
+                    tileList[count] = (int)set.GetID(i,j);
+                    count++;
+                }
+            }
         }
 
         public override void DrawUI() {
@@ -47,6 +54,11 @@ namespace TileMapper {
 
             var size = ImGui.GetContentRegionAvail();
 
+            currentWidth = size.X;
+            currentHeight = size.Y;
+            scaleX = currentWidth / trueWidth;
+            scaleY = currentHeight / trueHeight;
+
              //TileSelector click, tile selection
             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && ImGui.IsWindowHovered()) {
 
@@ -56,17 +68,17 @@ namespace TileMapper {
                 int x = (int)mousePos.X - (int)windowPos.X - 8;
                 int y = (int)mousePos.Y - (int)windowPos.Y - 27;
 
-                Console.WriteLine(x + " : " + y);
+                x = (int)(x/((UnitSize+TileGap)*scaleX));
+                y = (int)(y/((UnitSize+RowGap)*scaleY));
 
-                x = (int)(x/(UnitSize+20));
-                y = (int)(y/(UnitSize+20));
-
-                if (x >= 0)
-                    TileSelctedID = tileList[x];
+                if (x >= 0 && y>=0) {
+                    int tileIndex = x + y*TilesPerRow;
+                    TileSelctedID = tileList[tileIndex];
+                }
 
             }
 
-            DrawRenderTarget((int)size.X, (int)size.Y);
+            DrawRenderTarget((int)currentWidth, (int)currentHeight);
 
             ImGui.End();
         }
@@ -79,23 +91,19 @@ namespace TileMapper {
 
             Raylib.ClearBackground(Color.DARKBLUE);
 
-            var t = set.GetTileDimensions();
-
+            float scale = (float)UnitSize/set.TileWidth;
             int col = 0, row = 0;
-            for (uint i = 0, count = 0; i < t.Item1; i++) {
-                for (uint j = 0; j < t.Item2; j++) {
-                    float scale = UnitSize/set.TileWidth;
-                    set.Draw(row*UnitSize + row*TileGap, col*UnitSize+RowGap*col, set.GetID(j,i), scale);
-                    tileList[count] = (int)set.GetID(i,j);
-                    count++;
-                    row++;
 
-                    if(row >= TilesPerRow) {
-                        col++;
-                        row = 0;
-                    }
+            for (int i = 0; i < tileList.Length; i++) {
+
+                set.Draw(row*UnitSize + row*TileGap, col*UnitSize+RowGap*col, (uint)tileList[i], scale);
+
+                row++;
+                if(row >= TilesPerRow) {
+                    col++;
+                    row = 0;
                 }
-            }        
+            }
         }
 
         public int GetTileSelectedTD() {

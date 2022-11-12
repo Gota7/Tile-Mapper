@@ -15,7 +15,7 @@ namespace TileMapper {
 
         TileSelector ts;
 
-        TileSet set = new TileSet("./TestTileset.tms");
+        TileSet set = new TileSet("./grass.tms");
 
         int trueWidth, trueHeight;
         float currentWidth, currentHeight;
@@ -100,7 +100,7 @@ namespace TileMapper {
 
                     if (map[i,j] != -1) {
                         //Raylib.DrawRectangle(i*unitSize,j*unitSize,unitSize,unitSize,Color.DARKGREEN);
-                        float scale = unitSize/set.TileWidth;
+                        float scale = (float)unitSize/set.TileWidth;
                         set.Draw(i*unitSize,j*unitSize,(uint)map[i,j], scale);
                     }
 
