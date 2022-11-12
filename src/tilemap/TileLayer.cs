@@ -33,6 +33,18 @@ namespace TileMapper
             this._tilePlacements = tiles;
         }
 
+        // Method to retrieve the number of columns in layer.
+        public ushort GetCols()
+        {
+            return (ushort)this._tilePlacements.GetLength(1);
+        }
+
+        // Method to retrieve the number of rows in layer.
+        public ushort GetRows()
+        {
+            return (ushort)this._tilePlacements.GetLength(0);
+        }
+
         // Method to get tile at location.
         public int GetTile(uint x, uint y)
         {
@@ -43,6 +55,12 @@ namespace TileMapper
         public void SetTile(uint x, uint y, int newId)
         {
             this._tilePlacements[x, y] = newId;
+        }
+
+        // Method to change the tile set for the layer.
+        public string GetTileSet()
+        {
+            return this._tileSet;
         }
 
         // Method to change the tile set for the layer.

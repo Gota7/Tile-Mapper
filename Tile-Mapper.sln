@@ -3,27 +3,28 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tile-Mapper", "src\Tile-Mapper.csproj", "{F7A49B02-E5EE-48DF-8D9F-1D6DC99F70BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tile-Mapper", "src\Tile-Mapper.csproj", "{F7A49B02-E5EE-48DF-8D9F-1D6DC99F70BC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A7D470C5-44CD-4DDB-8CA1-09D421416F4A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "graphics", "graphics", "{59EF2379-DEFC-457C-A661-24BB852DDB42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windowing", "tests\graphics\windowing\Windowing.csproj", "{B9B577EB-DBEF-4D1A-9194-B457D06D9BDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windowing", "tests\graphics\windowing\Windowing.csproj", "{B9B577EB-DBEF-4D1A-9194-B457D06D9BDC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tileset", "tileset", "{06573BD3-F73C-4318-B7A3-71B1CF025B2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TilesetTests", "tests\tileset\main\TilesetTests.csproj", "{F4EDB484-227E-4F1C-86C0-5C903D144450}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TilesetTests", "tests\tileset\main\TilesetTests.csproj", "{F4EDB484-227E-4F1C-86C0-5C903D144450}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drawing", "tests\tileset\drawing\Drawing.csproj", "{92166C21-C8E4-433F-8615-CDA7C522F5E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Drawing", "tests\tileset\drawing\Drawing.csproj", "{92166C21-C8E4-433F-8615-CDA7C522F5E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tilemap", "tilemap", "{CC169093-D28C-41B9-8020-E9950BC4266C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TileMapTests", "TileMapTests\TileMapTests.csproj", "{F19260D3-340F-489B-A463-6A0E7A24C5C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F7A49B02-E5EE-48DF-8D9F-1D6DC99F70BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -42,6 +43,13 @@ Global
 		{92166C21-C8E4-433F-8615-CDA7C522F5E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92166C21-C8E4-433F-8615-CDA7C522F5E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92166C21-C8E4-433F-8615-CDA7C522F5E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F19260D3-340F-489B-A463-6A0E7A24C5C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F19260D3-340F-489B-A463-6A0E7A24C5C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F19260D3-340F-489B-A463-6A0E7A24C5C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F19260D3-340F-489B-A463-6A0E7A24C5C4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{59EF2379-DEFC-457C-A661-24BB852DDB42} = {A7D470C5-44CD-4DDB-8CA1-09D421416F4A}
@@ -49,5 +57,10 @@ Global
 		{06573BD3-F73C-4318-B7A3-71B1CF025B2E} = {A7D470C5-44CD-4DDB-8CA1-09D421416F4A}
 		{F4EDB484-227E-4F1C-86C0-5C903D144450} = {06573BD3-F73C-4318-B7A3-71B1CF025B2E}
 		{92166C21-C8E4-433F-8615-CDA7C522F5E7} = {06573BD3-F73C-4318-B7A3-71B1CF025B2E}
+		{CC169093-D28C-41B9-8020-E9950BC4266C} = {A7D470C5-44CD-4DDB-8CA1-09D421416F4A}
+		{F19260D3-340F-489B-A463-6A0E7A24C5C4} = {CC169093-D28C-41B9-8020-E9950BC4266C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2B5D2670-9100-4025-A99B-BDB948F53551}
 	EndGlobalSection
 EndGlobal
