@@ -24,6 +24,8 @@
 
             this._rows = 100;
             this._columns = 100;
+
+            this._layers = new List<TileLayer>();
         }
 
         // Constructor that loads from file.
@@ -34,10 +36,29 @@
             throw new NotImplementedException();
         }
 
+        // Method to retrieve the number of columns in map.
+        public ushort GetCols()
+        {
+            return this._columns;
+        }
+
+        // Method to retrieve the number of rows in map.
+        public ushort GetRows()
+        {
+            return this._rows;
+        }
+
         // Method to retrieve a layer for a given index.
         public TileLayer GetLayer(int index)
         {
-            return index >= this._layers.Count ? null : this._layers[index];
+            if (index < this.GetLayerCount() && index >= 0)
+            {
+                return this._layers[index];
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
         }
 
         // Method to get the current layer.
@@ -66,7 +87,18 @@
         // Method to remove layer by index.
         public void DeleteLayer(int index)
         {
-            this._layers.RemoveAt(index);
+            if (index < this.GetLayerCount() && index >= 0)
+            {
+                this._layers.RemoveAt(index);
+                if (this._currentLayer >= this.GetLayerCount())
+                {
+                    this.SetCurrentLayer(this.GetLayerCount() - 1);
+                }
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
         }
 
         // Method to remove layer by class.
@@ -79,11 +111,24 @@
         public void SwapLayers(int firstIndex, int secondIndex)
         {
             // Ensuring the two layers are valid.
-            if(firstIndex < this._layers.Count && secondIndex < this._layers.Count)
+            if(firstIndex < this.GetLayerCount() && secondIndex < this.GetLayerCount() && firstIndex >= 0 && secondIndex >= 0)
             {
                 TileLayer temp = this._layers[firstIndex];
                 this._layers[firstIndex] = this._layers[secondIndex];
                 this._layers[secondIndex] = temp;
+
+                if(this._currentLayer == firstIndex)
+                {
+                    this._currentLayer = secondIndex;
+                }
+                else if(this._currentLayer == secondIndex)
+                {
+                    this._currentLayer = firstIndex;
+                }
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
             }
         }
 
