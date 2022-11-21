@@ -9,12 +9,14 @@ using TileMapper;
 
     rlImGui.Setup(true);
 
+
     TileSet set = new TileSet("./TestTileset.tms");
 
     Boolean circle = true;
     float radius = 30f;
     TileSelector ts = new TileSelector();
-    Canvas c = new Canvas(ts);
+    Canvas c = new Canvas(ts, new TileMap(15,15,30,30));
+    TSSelector tss = new TSSelector("");
 
     var size = set.GetTileDimensions();
     float scale = 25f;
@@ -48,6 +50,7 @@ using TileMapper;
         ImGui.End();
         c.DrawUI();
         ts.DrawUI();
+        tss.DrawUI();
         rlImGui.End();
 
         Raylib.EndDrawing();
