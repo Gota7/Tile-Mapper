@@ -48,7 +48,7 @@ namespace TileMapper
         // Get ID from a tile position in the grid.
         public uint GetID(uint x, uint y)
         {
-            return y * TileWidth + x;
+            return y * GetTileDimensions().Item1 + x;
         }
 
         // Draw a tile to a given position.
