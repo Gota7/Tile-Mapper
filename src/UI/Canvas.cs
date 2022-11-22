@@ -17,18 +17,19 @@ namespace TileMapper {
 
         TileSelector ts;
 
-        TileSet set = new TileSet("./grass.tms");
+        TileSet set = null;
 
         int trueWidth, trueHeight;
         float currentWidth, currentHeight;
 
-        float scaleX, scaleY; //scale = currernt/true
+        // Scale = currernt/true.
+        float scaleX, scaleY; 
 
         bool sizeSet = false;
 
 
-        //the width and height should be that of the tile map
-        public Canvas(TileSelector ts, TileMap tMap) : base(0,0/*must be true size*/) {
+        // The width and height should be that of the tile map.
+        public Canvas(TileSelector ts, TileMap tMap) : base(0,0) {
             
             this.tMap = tMap;
 
@@ -45,7 +46,7 @@ namespace TileMapper {
 
         public override void DrawUI() {
 
-            //canvas is 600x600, other window elements are 8x27x8x8 found from GetWindowContentRegionMin
+            // Canvas is 600x600, other window elements are 8x27x8x8 found from GetWindowContentRegionMin.
 
             if (!sizeSet){
                 ImGui.SetNextWindowSize(new Vector2(trueWidth + 8 + 8,trueHeight + 27 + 8));
@@ -65,7 +66,7 @@ namespace TileMapper {
 
             currentLayer = tMap.GetCurrentLayer();
 
-            //canvas click, tile placement
+            // Canvas click, tile placement.
             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)) {
 
                 Vector2 windowPos = ImGui.GetWindowPos();
@@ -114,12 +115,12 @@ namespace TileMapper {
         public override void Update() {
         }
 
-        //draw according to trueSize not current
+        // Draw according to trueSize not current.
         protected override void Draw() {
 
             Raylib.ClearBackground(Color.DARKBLUE);
 
-            //draw each layer
+            // Draw each layer.
             for (int k = 0; k < tMap.GetLayerCount(); k++) {
 
                 TileLayer layer = tMap.GetLayer(k);
@@ -131,7 +132,7 @@ namespace TileMapper {
 
                         set = tMap.NameToSet(t.TileSet);
 
-                        //null check
+                        // Null check.
                         if (set == null)
                             continue;
 
@@ -147,7 +148,7 @@ namespace TileMapper {
             DrawTileBorders();
         }
 
-        //draws the tile borders
+        // Draws the tile borders.
         private void DrawTileBorders() {
             for (uint i = 0; i < mapWidth; i++) {
                 for (uint j = 0; j < mapHeight; j++) {

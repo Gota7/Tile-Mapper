@@ -16,16 +16,17 @@ namespace TileMapper {
         int trueWidth, trueHeight;
         float currentWidth, currentHeight;
 
-        float scaleX, scaleY; //scale = currernt/true
+        // Scale = currernt/true.
+        float scaleX, scaleY;
 
-        //number of columns
+        // Number of columns.
         int rowNum;
 
         private Tile TileSelcted;
 
         private int[] tileList;
         
-        TileSet set = null; //= new TileSet("./grass.tms");
+        TileSet set = null;
 
         bool sizeSet = false;
 
@@ -67,7 +68,7 @@ namespace TileMapper {
             scaleX = currentWidth / trueWidth;
             scaleY = currentHeight / trueHeight;
 
-             //TileSelector click, tile selection
+             // TileSelector click, tile selection.
             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && ImGui.IsWindowHovered()) {
 
                 Vector2 windowPos = ImGui.GetWindowPos();
@@ -98,7 +99,7 @@ namespace TileMapper {
 
         protected override void Draw() {
 
-            //null check
+            // Null check.
             if (set == null)
                 return;
 
@@ -111,7 +112,7 @@ namespace TileMapper {
 
                 set.Draw(row*UnitSize + row*TileGap, col*UnitSize+RowGap*col, (uint)tileList[i], scale);
                 
-                //draw border around selected tile
+                // Draw border around selected tile.
                 if (TileSelcted.Id == tileList[i])
                     Raylib.DrawRectangleLinesEx(new Rectangle(row*UnitSize + row*TileGap,col*UnitSize+RowGap*col,UnitSize,UnitSize), 2f, Color.BLACK);
 
@@ -149,7 +150,7 @@ namespace TileMapper {
             }
         }
         
-        //uncomment these lines if you want selected Tile to reset when changing TileSets
+        // Uncomment these lines if you want selected Tile to reset when changing TileSets.
         // TileSelcted.TileSet = "";
         // TileSelcted.Id = -1;
     }

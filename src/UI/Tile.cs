@@ -2,7 +2,7 @@ namespace TileMapper {
 
     public class Tile {
         
-        //name of the TileSet this tile comes from
+        // Name of the TileSet this tile comes from.
         public String TileSet {get; set;}
 
         public int Id {get; set;}

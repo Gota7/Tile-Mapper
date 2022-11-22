@@ -7,7 +7,7 @@ namespace TileMapper {
 
     public class TSSelector : Window {
 
-        //stores the TileSet names' and their paths
+        // Stores the TileSet names' and their paths.
         private List<String> tileSets = new List<string>();
 
         private String tsPath;
@@ -18,10 +18,10 @@ namespace TileMapper {
 
         private TileMap tMap;
 
-        //FileName to TileSet, keep tracks of the sets that have been loaded. prevents laoding a set twice
+        // FileName to TileSet, keep tracks of the sets that have been loaded. prevents laoding a set twice.
         private Dictionary<String, TileSet> fnameToSet;
 
-        //give path of folder containing TileSets
+        // Give path of folder containing TileSets.
         public TSSelector(String tsPath, TileSelector ts, TileMap tMap) {
 
             this.ts = ts;
@@ -54,6 +54,7 @@ namespace TileMapper {
 
                 if (ImGui.Button("add layer")) {
                     tMap.AddLayer();
+                    currentLayer = tMap.GetLayerCount() - 1;
                 }
                 ImGui.EndTabItem();
             }
@@ -70,7 +71,7 @@ namespace TileMapper {
 
         }
 
-        //TileSet selection creationa and behavior
+        // TileSet selection creationa and behavior.
         private void CreateSelectables() {
             
             foreach (String fname in tileSets) {
@@ -92,7 +93,7 @@ namespace TileMapper {
             }
         }
 
-        //Layer Selections
+        // Layer Selections.
         private void CreateLayers() {
 
             for (int i = 0; i < tMap.GetLayerCount(); i++) {
