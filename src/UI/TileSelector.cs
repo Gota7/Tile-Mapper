@@ -3,157 +3,183 @@ using Raylib_cs;
 using ImGuiNET;
 using System.Numerics;
 
-namespace TileMapper {
+namespace TileMapper
+{
 
-    public class TileSelector : GraphicsWindow {
+    public class TileSelector : GraphicsWindow
+    {
 
         public static int TilesPerRow = 5;
-        
+
         public static int UnitSize = 50;
 
         public static int TileGap = 20, RowGap = 10;
 
-        int trueWidth, trueHeight;
-        float currentWidth, currentHeight;
+        private int _trueWidth, _trueHeight;
+        private float _currentWidth, _currentHeight;
 
         // Scale = currernt/true.
-        float scaleX, scaleY;
+        private float _scaleX, _scaleY;
 
-        // Number of columns.
-        int rowNum;
+        // Number of rows.
+        private int _rowNum;
 
-        private Tile TileSelcted;
+        private Tile _TileSelcted;
 
-        private int[] tileList;
-        
-        TileSet set = null;
+        private int[] _tileList;
 
-        bool sizeSet = false;
+        private TileSet _set = null;
 
-        public TileSelector() : base(0, 0) { 
+        private bool _sizeSet = false;
 
-            // var dim = set.GetTileDimensions();
+        private int _windowPadding, _windowPaddingTop;
+
+        public TileSelector() : base(0, 0)
+        {
+
+            // var dim = _set.GetTileDimensions();
             // uint tileNum = dim.Item1*dim.Item2;
-            // tileList = new int[tileNum];
+            // _tileList = new int[tileNum];
 
-            // rowNum = (int)Math.Ceiling((double)tileNum/TilesPerRow);
+            // _rowNum = (int)Math.Ceiling((double)tileNum/TilesPerRow);
 
-            // trueWidth = TilesPerRow*UnitSize + (TilesPerRow-1)*TileGap;
-            // trueHeight = rowNum*UnitSize + (rowNum-1)*RowGap;
-            // this.ResizeRenderTarget(trueWidth, trueHeight);
+            // _trueWidth = TilesPerRow*UnitSize + (TilesPerRow-1)*TileGap;
+            // _trueHeight = _rowNum*UnitSize + (_rowNum-1)*RowGap;
+            // this.ResizeRenderTarget(_trueWidth, _trueHeight);
 
             // for (uint i = 0, count = 0; i < dim.Item1; i++) {
             //     for (uint j = 0; j < dim.Item2; j++) {
-            //         tileList[count] = (int)set.GetID(i,j);
+            //         _tileList[count] = (int)_set.GetID(i,j);
             //         count++;
             //     }
             // }
 
-            TileSelcted = new Tile("", -1);
+            _TileSelcted = new Tile("", -1);
         }
 
-        public override void DrawUI() {
+        public override void DrawUI()
+        {
 
-            if (!sizeSet) {
-            ImGui.SetNextWindowSize(new Vector2(trueWidth + 8 + 8, trueHeight + 27 + 8));
-            sizeSet = true;
+            GetWindowPadding();
+
+            if (!_sizeSet)
+            {
+                ImGui.SetNextWindowSize(new Vector2(_trueWidth + 2*_windowPadding, _trueHeight + _windowPaddingTop + _windowPadding));
+                _sizeSet = true;
             }
 
             ImGui.Begin("Tile Selector");
 
             var size = ImGui.GetContentRegionAvail();
 
-            currentWidth = size.X;
-            currentHeight = size.Y;
-            scaleX = currentWidth / trueWidth;
-            scaleY = currentHeight / trueHeight;
+            _currentWidth = size.X;
+            _currentHeight = size.Y;
+            _scaleX = _currentWidth / _trueWidth;
+            _scaleY = _currentHeight / _trueHeight;
 
-             // TileSelector click, tile selection.
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && ImGui.IsWindowHovered()) {
+            // TileSelector click, tile selection.
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && ImGui.IsWindowHovered())
+            {
 
                 Vector2 windowPos = ImGui.GetWindowPos();
                 Vector2 mousePos = ImGui.GetMousePos();
 
-                int x = (int)mousePos.X - (int)windowPos.X - 8;
-                int y = (int)mousePos.Y - (int)windowPos.Y - 27;
+                int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
+                int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
 
-                x = (int)(x/((UnitSize+TileGap)*scaleX));
-                y = (int)(y/((UnitSize+RowGap)*scaleY));
+                x = (int)(x / ((UnitSize + TileGap) * _scaleX));
+                y = (int)(y / ((UnitSize + RowGap) * _scaleY));
 
-                if (x >= 0 && y>=0) {
-                    int tileIndex = x + y*TilesPerRow;
-                    TileSelcted.Id = tileList[tileIndex];
-                    TileSelcted.TileSet = set.Name;
+                if (x >= 0 && y >= 0)
+                {
+                    int tileIndex = x + y * TilesPerRow;
+                    _TileSelcted.Id = _tileList[tileIndex];
+                    _TileSelcted.TileSet = _set.Name;
                 }
 
             }
 
-            DrawRenderTarget((int)currentWidth, (int)currentHeight);
+            DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
 
             ImGui.End();
         }
 
-        public override void Update() {
+        public override void Update()
+        {
 
         }
 
-        protected override void Draw() {
+        protected override void Draw()
+        {
 
             // Null check.
-            if (set == null)
+            if (_set == null)
                 return;
 
             Raylib.ClearBackground(Color.DARKBLUE);
 
-            float scale = (float)UnitSize/set.TileWidth;
+            float scale = (float)UnitSize / _set.TileWidth;
             int col = 0, row = 0;
 
-            for (int i = 0; i < tileList.Length; i++) {
+            for (int i = 0; i < _tileList.Length; i++)
+            {
 
-                set.Draw(row*UnitSize + row*TileGap, col*UnitSize+RowGap*col, (uint)tileList[i], scale);
-                
+                _set.Draw(row * UnitSize + row * TileGap, col * UnitSize + RowGap * col, (uint)_tileList[i], scale);
+
                 // Draw border around selected tile.
-                if (TileSelcted.Id == tileList[i])
-                    Raylib.DrawRectangleLinesEx(new Rectangle(row*UnitSize + row*TileGap,col*UnitSize+RowGap*col,UnitSize,UnitSize), 2f, Color.BLACK);
+                if (_TileSelcted.Id == _tileList[i])
+                    Raylib.DrawRectangleLinesEx(new Rectangle(row * UnitSize + row * TileGap, col * UnitSize + RowGap * col, UnitSize, UnitSize), 2f, Color.BLACK);
 
                 row++;
-                if(row >= TilesPerRow) {
+                if (row >= TilesPerRow)
+                {
                     col++;
                     row = 0;
                 }
             }
         }
 
-        public Tile GetTileSelected() {
-            return TileSelcted;
+        public Tile GetTileSelected()
+        {
+            return _TileSelcted;
         }
 
-        public void ChangeTileSet(TileSet ts) {
+        public void ChangeTileSet(TileSet ts)
+        {
 
-        set = ts;
+            _set = ts;
 
-        var dim = set.GetTileDimensions();
-        uint tileNum = dim.Item1*dim.Item2;
-        tileList = new int[tileNum];
+            var dim = _set.GetTileDimensions();
+            uint tileNum = dim.Item1 * dim.Item2;
+            _tileList = new int[tileNum];
 
-        rowNum = (int)Math.Ceiling((double)tileNum/TilesPerRow);
+            _rowNum = (int)Math.Ceiling((double)tileNum / TilesPerRow);
 
-        trueWidth = TilesPerRow*UnitSize + (TilesPerRow-1)*TileGap;
-        trueHeight = rowNum*UnitSize + (rowNum-1)*RowGap;
-        this.ResizeRenderTarget(trueWidth, trueHeight);
-        sizeSet = false;
+            _trueWidth = TilesPerRow * UnitSize + (TilesPerRow - 1) * TileGap;
+            _trueHeight = _rowNum * UnitSize + (_rowNum - 1) * RowGap;
+            this.ResizeRenderTarget(_trueWidth, _trueHeight);
+            _sizeSet = false;
 
-        for (uint i = 0, count = 0; i < dim.Item1; i++) {
-            for (uint j = 0; j < dim.Item2; j++) {
-                tileList[count] = (int)set.GetID(i,j);
-                count++;
+            for (uint i = 0, count = 0; i < dim.Item1; i++)
+            {
+                for (uint j = 0; j < dim.Item2; j++)
+                {
+                    _tileList[count] = (int)_set.GetID(i, j);
+                    count++;
+                }
             }
+
+            // Uncomment these lines if you want selected Tile to reset when changing TileSets.
+            // _TileSelcted.TileSet = "";
+            // _TileSelcted.Id = -1;
         }
-        
-        // Uncomment these lines if you want selected Tile to reset when changing TileSets.
-        // TileSelcted.TileSet = "";
-        // TileSelcted.Id = -1;
-    }
+
+        private void GetWindowPadding()
+        {
+            var v = ImGui.GetWindowContentRegionMin();
+            _windowPadding = (int)v.X;
+            _windowPaddingTop = (int)v.Y;
+        }
 
     }
 }

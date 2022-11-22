@@ -3,58 +3,66 @@ using Raylib_cs;
 using ImGuiNET;
 using System.Numerics;
 
-namespace TileMapper {
+namespace TileMapper
+{
 
-    public class TSSelector : Window {
+    public class TSSelector : Window
+    {
 
         // Stores the TileSet names' and their paths.
-        private List<String> tileSets = new List<string>();
+        private List<String> _tileSets = new List<string>();
 
-        private String tsPath;
+        private String _tsPath;
 
-        private int currentLayer;
+        private int _currentLayer;
 
-        private TileSelector ts;
+        private TileSelector _ts;
 
-        private TileMap tMap;
+        private TileMap _tMap;
 
         // FileName to TileSet, keep tracks of the sets that have been loaded. prevents laoding a set twice.
-        private Dictionary<String, TileSet> fnameToSet;
+        private Dictionary<String, TileSet> _fnameToSet;
 
         // Give path of folder containing TileSets.
-        public TSSelector(String tsPath, TileSelector ts, TileMap tMap) {
+        public TSSelector(String tsPath, TileSelector ts, TileMap tMap)
+        {
 
-            this.ts = ts;
-            this.tMap = tMap;
-            this.tsPath = tsPath;
-            fnameToSet = new Dictionary<string, TileSet>();
+            this._ts = ts;
+            this._tMap = tMap;
+            this._tsPath = tsPath;
+            _fnameToSet = new Dictionary<string, TileSet>();
 
-            var test = Directory.EnumerateFiles(tsPath);
-            foreach (String s in test) {
-                tileSets.Add(Path.GetFileName(s));
+            var test = Directory.EnumerateFiles(_tsPath);
+            foreach (String s in test)
+            {
+                _tileSets.Add(Path.GetFileName(s));
             }
 
-            currentLayer = 0;
+            _currentLayer = 0;
         }
 
-        public override void DrawUI() {
+        public override void DrawUI()
+        {
 
             ImGui.Begin("TileSet Selector");
-            
+
             ImGui.BeginTabBar("t");
 
-            if (ImGui.BeginTabItem("TileSets")) {
+            if (ImGui.BeginTabItem("TileSets"))
+            {
                 CreateSelectables();
                 ImGui.EndTabItem();
             }
 
 
-            if (ImGui.BeginTabItem("Layers")) {
+            if (ImGui.BeginTabItem("Layers"))
+            {
                 CreateLayers();
 
-                if (ImGui.Button("add layer")) {
-                    tMap.AddLayer();
-                    currentLayer = tMap.GetLayerCount() - 1;
+                if (ImGui.Button("add layer"))
+                {
+                    _tMap.AddLayer();
+                    _currentLayer = _tMap.GetLayerCount() - 1;
                 }
                 ImGui.EndTabItem();
             }
@@ -67,42 +75,52 @@ namespace TileMapper {
             ImGui.End();
         }
 
-        public override void Update() {
+        public override void Update()
+        {
 
         }
 
         // TileSet selection creationa and behavior.
-        private void CreateSelectables() {
-            
-            foreach (String fname in tileSets) {
+        private void CreateSelectables()
+        {
 
-                String path = tsPath + "/" + fname;
-                
-                if (ImGui.Selectable(fname)) {
-                    if (!fnameToSet.ContainsKey(fname)) {
+            foreach (String fname in _tileSets)
+            {
+
+                String path = _tsPath + "/" + fname;
+
+                if (ImGui.Selectable(fname))
+                {
+                    if (!_fnameToSet.ContainsKey(fname))
+                    {
                         TileSet set = new TileSet(path);
-                        fnameToSet.Add(fname, set);
-                        ts.ChangeTileSet(set);
-                        tMap.AddTileSet(set);
-                    } else {
-                        TileSet set = fnameToSet[fname];
-                        ts.ChangeTileSet(set);
+                        _fnameToSet.Add(fname, set);
+                        _ts.ChangeTileSet(set);
+                        _tMap.AddTileSet(set);
                     }
-                    
+                    else
+                    {
+                        TileSet set = _fnameToSet[fname];
+                        _ts.ChangeTileSet(set);
+                    }
+
                 }
             }
         }
 
         // Layer Selections.
-        private void CreateLayers() {
+        private void CreateLayers()
+        {
 
-            for (int i = 0; i < tMap.GetLayerCount(); i++) {
+            for (int i = 0; i < _tMap.GetLayerCount(); i++)
+            {
 
-                String layerName = (i == currentLayer) ? "Layer " + i + "*": "Layer " + i;
+                String layerName = (i == _currentLayer) ? "Layer " + i + "*" : "Layer " + i;
 
-                if (ImGui.Selectable(layerName)) {
-                    tMap.SetCurrentLayer(i);
-                    currentLayer = i;
+                if (ImGui.Selectable(layerName))
+                {
+                    _tMap.SetCurrentLayer(i);
+                    _currentLayer = i;
                 }
             }
         }

@@ -15,7 +15,7 @@ TileSet set = new TileSet("./TestTileset.tms");
 Boolean circle = true;
 float radius = 30f;
 TileSelector ts = new TileSelector();
-TileMap tMap = new TileMap(15,15,30,30);
+TileMap tMap = new TileMap(15, 15, 30, 30);
 TSSelector tss = new TSSelector("./TileSets", ts, tMap);
 Canvas c = new Canvas(ts, tMap);
 
@@ -25,25 +25,25 @@ float drawnWidth = set.TileWidth * scale;
 float drawnHeight = set.TileHeight * scale;
 
 
-int tileId = (int)set.GetID(0,0);
+int tileId = (int)set.GetID(0, 0);
 
 
 while (!Raylib.WindowShouldClose())
 {
 
-    
+
     Raylib.BeginDrawing();
     Raylib.ClearBackground(Color.DARKGRAY);
 
 
     if (circle)
-        Raylib.DrawCircle(100,100,radius, Color.RED);
+        Raylib.DrawCircle(100, 100, radius, Color.RED);
 
     // Redner canvas raylib.
     c.DoDraw();
 
     ts.DoDraw();
-    
+
     rlImGui.Begin();
     ImGui.Begin("Red Circle");
     ImGui.Checkbox("draw circle", ref circle);
