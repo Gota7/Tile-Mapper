@@ -15,8 +15,9 @@ using TileMapper;
     Boolean circle = true;
     float radius = 30f;
     TileSelector ts = new TileSelector();
-    Canvas c = new Canvas(ts, new TileMap(15,15,30,30));
-    TSSelector tss = new TSSelector("");
+    TileMap tMap = new TileMap(15,15,30,30);
+    TSSelector tss = new TSSelector(".././UI Testing/TileSets", ts, tMap);
+    Canvas c = new Canvas(ts, tMap);
 
     var size = set.GetTileDimensions();
     float scale = 25f;
