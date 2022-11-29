@@ -18,13 +18,13 @@ namespace TileMapper
         private int _trueWidth, _trueHeight;
         private float _currentWidth, _currentHeight;
 
-        // Scale = currernt/true.
+        // Scale = current/true.
         private float _scaleX, _scaleY;
 
         // Number of rows.
         private int _rowNum;
 
-        private Tile _TileSelcted;
+        private int _tileSelected;
 
         private int[] _tileList;
 
@@ -54,7 +54,7 @@ namespace TileMapper
             //     }
             // }
 
-            _TileSelcted = new Tile("", -1);
+            _tileSelected = -1;
         }
 
         public override void DrawUI()
@@ -93,8 +93,7 @@ namespace TileMapper
                 if (x >= 0 && y >= 0)
                 {
                     int tileIndex = x + y * TilesPerRow;
-                    _TileSelcted.Id = _tileList[tileIndex];
-                    _TileSelcted.TileSet = _set.Name;
+                    _tileSelected = _tileList[tileIndex];
                 }
 
             }
@@ -127,7 +126,7 @@ namespace TileMapper
                 _set.Draw(row * UnitSize + row * TileGap, col * UnitSize + RowGap * col, (uint)_tileList[i], scale);
 
                 // Draw border around selected tile.
-                if (_TileSelcted.Id == _tileList[i])
+                if (_tileSelected == _tileList[i])
                     Raylib.DrawRectangleLinesEx(new Rectangle(row * UnitSize + row * TileGap, col * UnitSize + RowGap * col, UnitSize, UnitSize), 2f, Color.BLACK);
 
                 row++;
@@ -139,9 +138,9 @@ namespace TileMapper
             }
         }
 
-        public Tile GetTileSelected()
+        public int GetTileSelected()
         {
-            return _TileSelcted;
+            return _tileSelected;
         }
 
         public void ChangeTileSet(TileSet ts)

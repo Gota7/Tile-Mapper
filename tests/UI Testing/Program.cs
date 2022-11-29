@@ -16,6 +16,8 @@ Boolean circle = true;
 float radius = 30f;
 TileSelector ts = new TileSelector();
 TileMap tMap = new TileMap(15, 15, 30, 30);
+tMap.AddLayer("grass");
+tMap.AddLayer("TestTileset");
 TSSelector tss = new TSSelector("./TileSets", ts, tMap);
 Canvas c = new Canvas(ts, tMap);
 

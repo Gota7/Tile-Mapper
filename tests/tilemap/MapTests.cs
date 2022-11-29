@@ -10,7 +10,7 @@ namespace TileMapTests
         [Fact]
         public void TestAddLayer()
         {
-            TileMap map = new TileMap();
+            TileMap map = new TileMap(10, 10, 10, 10);
             TileLayer layer;
 
             Assert.Equal(0, map.GetLayerCount());
@@ -29,7 +29,7 @@ namespace TileMapTests
         [Fact]
         public void TestOOBOperations()
         {
-            TileMap map = new TileMap();
+            TileMap map = new TileMap(10, 10, 10, 10);
 
             // Testing MAP-2.
             Assert.Throws<System.IndexOutOfRangeException>(() => map.GetLayer(0));
@@ -45,7 +45,7 @@ namespace TileMapTests
         [Fact]
         public void TestReorderLayer()
         {
-            TileMap map = new TileMap();
+            TileMap map = new TileMap(10, 10, 10, 10);
             TileLayer layer1 = map.AddLayer("TestSet1");
             TileLayer layer2 = map.AddLayer("TestSet2");
 
@@ -90,7 +90,7 @@ namespace TileMapTests
         [Fact]
         public void TestResizeLayer()
         {
-            TileMap map = new TileMap();
+            TileMap map = new TileMap(10, 10, 10, 10);
             TileLayer layer1 = map.AddLayer("TestSet1");
             TileLayer layer2;
 
@@ -98,7 +98,7 @@ namespace TileMapTests
             ushort newCols = (ushort)(map.GetCols() * 2);
 
             map.Resize(newRows, newCols);
-            
+
             // Checking map size.
 
             Assert.Equal(newRows, map.GetRows());

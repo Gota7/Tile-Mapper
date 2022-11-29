@@ -51,13 +51,13 @@ namespace TileMapTests
 
             // Testing LYR-6.
 
-            Assert.Equal(initialSet, layer.GetTileSet());
+            Assert.Equal(initialSet, layer.TileSet);
 
             // Testing the changing and retrieval of a tile(LYR-5 and LYR-6).
 
-            layer.SetTileSet(newSet);
+            layer.TileSet = newSet;
 
-            Assert.Equal(newSet, layer.GetTileSet());
+            Assert.Equal(newSet, layer.TileSet);
         }
 
         // Testing the resize method.

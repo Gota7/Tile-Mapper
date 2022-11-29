@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Drawing", "tests\tileset\dr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tilemap", "tilemap", "{CC169093-D28C-41B9-8020-E9950BC4266C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TileMapTests", "TileMapTests\TileMapTests.csproj", "{F19260D3-340F-489B-A463-6A0E7A24C5C4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TileMapTests", "tests\tilemap\TileMapTests.csproj", "{F19260D3-340F-489B-A463-6A0E7A24C5C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -14,8 +14,6 @@ namespace TileMapper
 
         private String _tsPath;
 
-        private int _currentLayer;
-
         private TileSelector _ts;
 
         private TileMap _tMap;
@@ -24,7 +22,7 @@ namespace TileMapper
         private Dictionary<String, TileSet> _fnameToSet;
 
         // Give path of folder containing TileSets.
-        public TSSelector(String tsPath, TileSelector ts, TileMap tMap)
+        public TSSelector(string tsPath, TileSelector ts, TileMap tMap)
         {
 
             this._ts = ts;
@@ -38,7 +36,7 @@ namespace TileMapper
                 _tileSets.Add(Path.GetFileName(s));
             }
 
-            _currentLayer = 0;
+            _tMap.SetCurrentLayer(0);
         }
 
         public override void DrawUI()
@@ -59,10 +57,10 @@ namespace TileMapper
             {
                 CreateLayers();
 
-                if (ImGui.Button("add layer"))
+                if (ImGui.Button("Add layer"))
                 {
-                    _tMap.AddLayer();
-                    _currentLayer = _tMap.GetLayerCount() - 1;
+                    _tMap.AddLayer(_tileSets[0]); // TODO: FIX!!!
+                    _tMap.SetCurrentLayer(_tMap.GetLayerCount() - 1);
                 }
                 ImGui.EndTabItem();
             }
@@ -115,12 +113,11 @@ namespace TileMapper
             for (int i = 0; i < _tMap.GetLayerCount(); i++)
             {
 
-                String layerName = (i == _currentLayer) ? "Layer " + i + "*" : "Layer " + i;
+                String layerName = (i == _tMap.GetCurrentLayerIndex()) ? "Layer " + i + "*" : "Layer " + i;
 
                 if (ImGui.Selectable(layerName))
                 {
                     _tMap.SetCurrentLayer(i);
-                    _currentLayer = i;
                 }
             }
         }

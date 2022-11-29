@@ -6,26 +6,27 @@ namespace TileMapper
     public class TileLayer
     {
         // Variables.
-
-        private Tile[,] _tilePlacements;
+        public string TileSet;
+        private int[,] _tilePlacements;
 
         // Constructor for new layer.
-        public TileLayer(uint rows, uint columns)
+        public TileLayer(uint rows, uint columns, string tileSet)
         {
-            this._tilePlacements = new Tile[rows,columns];
+            TileSet = tileSet;
+            this._tilePlacements = new int[rows, columns];
 
             // Initialize a blank layer.
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    this._tilePlacements[i,j] = new Tile("", -1);
+                    this._tilePlacements[i,j] = -1;
                 }
             }
         }
 
         // Constructor for loaded layer.
-        public TileLayer(Tile[,] tiles)
+        public TileLayer(int[,] tiles)
         {
             this._tilePlacements = tiles;
         }
@@ -43,22 +44,21 @@ namespace TileMapper
         }
 
         // Method to get tile at location.
-        public Tile GetTile(uint x, uint y)
+        public int GetTile(uint x, uint y)
         {
-            return this._tilePlacements[x,y];
+            return this._tilePlacements[x, y];
         }
 
         // Method to set tile at location.
-        public void SetTile(uint x, uint y, int newId, String newTileSet)
+        public void SetTile(uint x, uint y, int newId)
         {
-            this._tilePlacements[x, y].Id = newId;
-            this._tilePlacements[x, y].TileSet = newTileSet;
+            this._tilePlacements[x, y] = newId;
         }
 
         // Method to resize the layer.
         public void Resize(uint rows, uint columns)
         {
-            Tile[,] newTiles = new Tile[rows,columns];
+            int[,] newTiles = new int[rows, columns];
 
             int oldRows = this._tilePlacements.GetLength(0);
             int oldCols = this._tilePlacements.GetLength(1);
@@ -68,13 +68,13 @@ namespace TileMapper
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    if(i < oldRows && j < oldCols)
+                    if (i < oldRows && j < oldCols)
                     {
                         newTiles[i, j] = this._tilePlacements[i, j];
                     }
                     else
                     {
-                        this._tilePlacements[i,j] = new Tile("", -1);
+                        newTiles[i, j] = -1;
                     }
                 }
             }

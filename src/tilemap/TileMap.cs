@@ -16,14 +16,14 @@
         private List<TileLayer> _layers;
         private int _currentLayer;
 
-        //Find TileSets from name, used by canvas to draw correct tile
-        private Dictionary<String, TileSet> nameToSet;
+        // Find TileSets from name, used by canvas to draw correct tile.
+        private Dictionary<String, TileSet> _nameToSet;
 
         // Constructor for new map.
         public TileMap(ushort rows, ushort columns, ushort tileWidth, ushort tileHeight)
         {
             this._filePath = "";
-            this._currentLayer = 0;
+            this._currentLayer = -1;
 
             this._rows = rows;
             this._columns = columns;
@@ -31,10 +31,8 @@
             this._tileHeight = tileHeight;
 
             this._layers = new List<TileLayer>();
-            _layers.Add(new TileLayer(_rows, _columns));
+            _nameToSet = new Dictionary<string, TileSet>();
 
-            nameToSet = new Dictionary<string, TileSet>();
-            
         }
 
         // Constructor that loads from file.
@@ -70,9 +68,16 @@
             }
         }
 
+        // Get the index of the current layer.
+        public int GetCurrentLayerIndex()
+        {
+            return _currentLayer;
+        }
+
         // Method to get the current layer.
         public TileLayer GetCurrentLayer()
         {
+            if (_currentLayer == -1) return null;
             return this._layers[this._currentLayer];
         }
 
@@ -83,9 +88,9 @@
         }
 
         // Method to add a new layer to the map.
-        public TileLayer AddLayer()
+        public TileLayer AddLayer(string tileSet)
         {
-            TileLayer newLayer = new TileLayer(this._rows, this._columns);
+            TileLayer newLayer = new TileLayer(this._rows, this._columns, tileSet);
 
             this._layers.Add(newLayer);
             this._currentLayer = this._layers.Count - 1;
@@ -167,11 +172,13 @@
             this._tileHeight = newHeight;
         }
 
-        public ushort GetUnitWidth() {
+        public ushort GetUnitWidth()
+        {
             return _tileWidth;
         }
 
-        public ushort GetUnitHeight() {
+        public ushort GetUnitHeight()
+        {
             return _tileHeight;
         }
 
@@ -189,16 +196,20 @@
             throw new NotImplementedException();
         }
 
-        public void AddTileSet(TileSet ts) {
-            nameToSet.Add(ts.Name, ts);
+        public void AddTileSet(TileSet ts)
+        {
+            _nameToSet.Add(ts.Name, ts);
         }
 
-        //given a name, a TileSet with that name will be returned.
-        public TileSet NameToSet(String name) {
-            
-            try {
-                return nameToSet[name];
-            } catch (Exception e) {
+        // Given a name, a TileSet with that name will be returned.
+        public TileSet NameToSet(String name)
+        {
+            try
+            {
+                return _nameToSet[name];
+            }
+            catch
+            {
                 return null;
             }
         }

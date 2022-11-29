@@ -15,11 +15,7 @@ namespace TileMapper
 
         private TileMap _tMap;
 
-        private TileLayer _currentLayer;
-
         private TileSelector _ts;
-
-        private TileSet _set = null;
 
         private int _trueWidth, _trueHeight;
         private float _currentWidth, _currentHeight;
@@ -72,8 +68,6 @@ namespace TileMapper
 
             //Console.WriteLine(_currentWidth + " " + _currentWidth + " " + _scaleX + " " + _scaleY + " " + _trueWidth + " " + _trueHeight);
 
-            _currentLayer = _tMap.GetCurrentLayer();
-
             // Canvas click, tile placement.
             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
             {
@@ -89,14 +83,12 @@ namespace TileMapper
                 x = (int)(x / (_unitSize * _scaleX));
                 y = (int)(y / (_unitSize * _scaleY));
 
-
-
                 try
                 {
-                    Tile t = _ts.GetTileSelected();
-                    _currentLayer.SetTile((uint)x, (uint)y, t.Id, t.TileSet);
+                    int t = _ts.GetTileSelected();
+                    _tMap.GetCurrentLayer().SetTile((uint)x, (uint)y, t);
                 }
-                catch (Exception e) { }
+                catch { }
 
             }
 
@@ -115,9 +107,9 @@ namespace TileMapper
 
                 try
                 {
-                    _currentLayer.SetTile((uint)x, (uint)y, -1, "");
+                    _tMap.GetCurrentLayer().SetTile((uint)x, (uint)y, -1);
                 }
-                catch (Exception e) { }
+                catch { }
             }
 
             // Draw target.
@@ -141,25 +133,24 @@ namespace TileMapper
             {
 
                 TileLayer layer = _tMap.GetLayer(k);
+                var set = _tMap.NameToSet(layer.TileSet);
 
                 for (uint i = 0; i < _mapWidth; i++)
                 {
                     for (uint j = 0; j < _mapHeight; j++)
                     {
 
-                        Tile t = layer.GetTile(i, j);
-
-                        _set = _tMap.NameToSet(t.TileSet);
+                        int t = layer.GetTile(i, j);
 
                         // Null check.
-                        if (_set == null)
+                        if (set == null)
                             continue;
 
-                        if (t.Id != -1)
+                        if (t != -1)
                         {
                             //Raylib.DrawRectangle(i*_unitSize,j*_unitSize,_unitSize,_unitSize,Color.DARKGREEN);
-                            float scale = (float)_unitSize / _set.TileWidth;
-                            _set.Draw(i * _unitSize, j * _unitSize, (uint)t.Id, scale);
+                            float scale = (float)_unitSize / set.TileWidth;
+                            set.Draw(i * _unitSize, j * _unitSize, (uint)t, scale);
                         }
                     }
                 }
