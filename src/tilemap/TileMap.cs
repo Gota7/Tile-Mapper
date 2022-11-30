@@ -1,4 +1,6 @@
-﻿namespace TileMapper
+﻿using PbvCompressor;
+
+namespace TileMapper
 {
     // Class to store and manipulate information related to current tile map.
     public class TileMap
@@ -40,7 +42,41 @@
         {
             this._filePath = filePath;
 
-            throw new NotImplementedException();
+            // Read data and uncompress.
+            using (FileStream fileIn = new FileStream(filePath, FileMode.Open))
+            {
+                if (fileIn.ReadByte() != 'T' || fileIn.ReadByte() != 'M' || fileIn.ReadByte() != 'M')
+                    throw new Exception("Can not load tileset " + filePath + ". Not a Tile-Mapper Tilemap.");
+                fileIn.ReadByte(); // Skip version.
+                using (MemoryStream uncompressed = new MemoryStream())
+                {
+                    PbvCompressorLZW compressor = new PbvCompressorLZW();
+                    compressor.Decompress(fileIn, uncompressed);
+                    uncompressed.Seek(0, SeekOrigin.Begin); // Decompress file and start at beginning of data.
+                    using (BinaryReader r = new BinaryReader(uncompressed))
+                    {
+                        _rows = r.ReadUInt16();
+                        _columns = r.ReadUInt16();
+                        _tileWidth = r.ReadUInt16();
+                        _tileHeight = r.ReadUInt16();
+                        int numLayers = r.ReadInt32();
+                        _layers = new List<TileLayer>();
+                        for (int i = 0; i < numLayers; i++)
+                        {
+                            string tileset = r.ReadString();
+                            int[,] tilePlacements = new int[_rows, _columns];
+                            for (int x = 0; x < _rows; x++)
+                            {
+                                for (int y = 0; y < _columns; y++)
+                                {
+                                    tilePlacements[x, y] = r.ReadInt32();
+                                }
+                            }
+                            _layers.Add(new TileLayer(tileset, tilePlacements));
+                        }
+                    }
+                }
+            }
         }
 
         // Method to retrieve the number of columns in map.
@@ -186,14 +222,37 @@
         public void Save(string filePath)
         {
             this._filePath = filePath;
-
             this.Save();
         }
 
         // Method to save to stored file path.
         public void Save()
         {
-            throw new NotImplementedException();
+            using (FileStream fileOut = new FileStream(_filePath, FileMode.Create))
+            {
+                using (MemoryStream uncompressed = new MemoryStream())
+                {
+                    using (BinaryWriter w = new BinaryWriter(uncompressed))
+                    {
+                        w.Write(_rows);
+                        w.Write(_columns);
+                        w.Write(_tileWidth);
+                        w.Write(_tileHeight);
+                        w.Write(_layers.Count);
+                        foreach (var layer in _layers)
+                        {
+                            layer.Write(w);
+                        }
+                        fileOut.WriteByte((byte)'T');
+                        fileOut.WriteByte((byte)'M');
+                        fileOut.WriteByte((byte)'M');
+                        fileOut.WriteByte(0); // Write out header and version.
+                        PbvCompressorLZW compressor = new PbvCompressorLZW();
+                        uncompressed.Seek(0, SeekOrigin.Begin);
+                        compressor.Compress(uncompressed, fileOut); // Seek to beginning of uncompressed data stream and write out compressed data.
+                    }
+                }
+            }
         }
 
         public void AddTileSet(TileSet ts)

@@ -1,3 +1,4 @@
+using System.IO;
 using TileMapper;
 using Xunit;
 
@@ -116,5 +117,38 @@ namespace TileMapTests
             Assert.Equal(newRows, layer2.GetRows());
             Assert.Equal(newCols, layer2.GetCols());
         }
+
+        // Test saving and loading.
+        [Fact]
+        public void TestSaveLoad()
+        {
+
+            // Save.
+            TileMap map = new TileMap(10, 12, 11, 13);
+            var layer1 = map.AddLayer("Layer1");
+            var layer2 = map.AddLayer("Layer2");
+            layer1.SetTile(3, 3, 7);
+            layer2.SetTile(7, 7, 3);
+            map.Save("Dummy.tmm");
+
+            // Test properties load.
+            TileMap lm = new TileMap("Dummy.tmm");
+            Assert.Equal(10, lm.GetRows());
+            Assert.Equal(12, lm.GetCols());
+            Assert.Equal(11, lm.GetUnitWidth());
+            Assert.Equal(13, lm.GetUnitHeight());
+            Assert.Equal("Layer1", lm.GetLayer(0).TileSet);
+            Assert.Equal("Layer2", lm.GetLayer(1).TileSet);
+            Assert.Equal(7, lm.GetLayer(0).GetTile(3, 3));
+            Assert.Equal(3, lm.GetLayer(1).GetTile(7, 7));
+            lm.Save("Dummy2.tmm");
+
+            // Check equality of files.
+            byte[] t1 = File.ReadAllBytes("Dummy.tmm");
+            byte[] t2 = File.ReadAllBytes("Dummy2.tmm");
+            Assert.Equal(t1, t2);
+
+        }
+
     }
 }
