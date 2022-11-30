@@ -76,7 +76,7 @@ namespace TileMapper.UI
                 {
                     ChangeImage(_fd.SelectedItem);
                     _fd = null;
-                }
+                } else if (!_fd.Open) _fd = null;
             }
         }
 

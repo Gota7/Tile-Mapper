@@ -39,7 +39,11 @@ namespace TileMapper.UI
 
         // Remove a tileset from the list. Returns if it was able to be removed.
         public bool RemoveTileset(string path) {
-            if (_fnameToSet.ContainsKey(path)) _fnameToSet.Remove(path);
+            if (_fnameToSet.ContainsKey(path))
+            {
+                _fnameToSet[path].Dispose();
+                _fnameToSet.Remove(path);
+            }
             else return false;
             if (CurrTileset.Equals(path)) CurrTileset = "";
             return true;
