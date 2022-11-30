@@ -1,3 +1,4 @@
+using System.Numerics;
 using Raylib_cs;
 
 namespace TileMapper
@@ -36,6 +37,12 @@ namespace TileMapper
 
         // Texture data for the tileset. Convenient to have both so saving the tileset doesn't involve copying data from the GPU.
         private Texture2D _texture;
+
+        // Image size.
+        public Vector2 TextureSize => new Vector2(_texture.width, _texture.height);
+
+        // Texture to draw.
+        public Texture2D Texture => _texture;
 
         // Create a new tileset from an image.
         public TileSet(string imagePath, string name)

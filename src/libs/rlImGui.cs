@@ -358,5 +358,18 @@ namespace rlImGui_cs
 
             ImGui.Image(new IntPtr(image.id), new Vector2(destWidth, destHeight), uv0, uv1);
         }
+
+        public static void Tooltip(string tip)
+        {
+            ImGui.SameLine();
+            ImGui.TextDisabled("(?)");
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.BeginTooltip();
+                ImGui.SetTooltip(tip);
+                ImGui.EndTooltip();
+            }
+        }
+
     }
 }
