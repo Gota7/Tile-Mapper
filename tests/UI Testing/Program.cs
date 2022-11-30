@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using Raylib_cs;
 using rlImGui_cs;
+using TileMapper.UI;
 using TileMapper;
 
 Raylib.SetConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT | ConfigFlags.FLAG_VSYNC_HINT | ConfigFlags.FLAG_WINDOW_RESIZABLE);
@@ -16,7 +17,15 @@ Boolean circle = true;
 float radius = 30f;
 TileSelector ts = new TileSelector();
 TileMap tMap = new TileMap(15, 15, 30, 30);
-TSSelector tss = new TSSelector("./TileSets", ts, tMap);
+tMap.AddLayer("grass");
+tMap.AddLayer("TestTileset");
+TSSelector tss = new TSSelector();
+var test = Directory.EnumerateFiles("./TileSets");
+foreach (string s in test)
+{
+    TileSet tms = new TileSet(s);
+    tss.AddTileset(s, tms);
+}
 Canvas c = new Canvas(ts, tMap);
 
 var size = set.GetTileDimensions();

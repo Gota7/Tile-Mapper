@@ -3,7 +3,7 @@ using Raylib_cs;
 using ImGuiNET;
 using System.Numerics;
 
-namespace TileMapper
+namespace TileMapper.UI
 {
 
     public class TileSelector : GraphicsWindow
@@ -18,13 +18,13 @@ namespace TileMapper
         private int _trueWidth, _trueHeight;
         private float _currentWidth, _currentHeight;
 
-        // Scale = currernt/true.
+        // Scale = current/true.
         private float _scaleX, _scaleY;
 
         // Number of rows.
         private int _rowNum;
 
-        private Tile _TileSelcted;
+        private int _tileSelected;
 
         private int[] _tileList;
 
@@ -54,11 +54,12 @@ namespace TileMapper
             //     }
             // }
 
-            _TileSelcted = new Tile("", -1);
+            _tileSelected = -1;
         }
 
         public override void DrawUI()
         {
+            if (_set == null) return;
 
             GetWindowPadding();
 
@@ -78,35 +79,34 @@ namespace TileMapper
             _scaleY = _currentHeight / _trueHeight;
 
             // TileSelector click, tile selection.
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && ImGui.IsWindowHovered())
+            var currPos = ImGui.GetCursorPos();
+            if (ImGui.IsMouseDown(ImGuiMouseButton.Left) && ImGui.IsWindowFocused())
             {
 
                 Vector2 windowPos = ImGui.GetWindowPos();
                 Vector2 mousePos = ImGui.GetMousePos();
-
                 int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
                 int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
-
-                x = (int)(x / ((UnitSize + TileGap) * _scaleX));
-                y = (int)(y / ((UnitSize + RowGap) * _scaleY));
-
-                if (x >= 0 && y >= 0)
+                if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight)
                 {
-                    int tileIndex = x + y * TilesPerRow;
-                    _TileSelcted.Id = _tileList[tileIndex];
-                    _TileSelcted.TileSet = _set.Name;
+                    x = (int)(x / ((UnitSize + TileGap) * _scaleX));
+                    y = (int)(y / ((UnitSize + RowGap) * _scaleY));
+
+                    if (x >= 0 && y >= 0)
+                    {
+                        int tileIndex = x + y * TilesPerRow;
+                        var dims = _set.GetTileDimensions();
+                        _tileSelected = tileIndex >= (dims.Item1 * dims.Item2) ? -1 : _tileList[tileIndex];
+                    }
                 }
 
             }
 
+            ImGui.InvisibleButton("NoDrag", new Vector2(_currentWidth, _currentHeight)); // Prevent dragging of window.
+            ImGui.SetCursorPos(currPos);
             DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
 
             ImGui.End();
-        }
-
-        public override void Update()
-        {
-
         }
 
         protected override void Draw()
@@ -127,7 +127,7 @@ namespace TileMapper
                 _set.Draw(row * UnitSize + row * TileGap, col * UnitSize + RowGap * col, (uint)_tileList[i], scale);
 
                 // Draw border around selected tile.
-                if (_TileSelcted.Id == _tileList[i])
+                if (_tileSelected == _tileList[i])
                     Raylib.DrawRectangleLinesEx(new Rectangle(row * UnitSize + row * TileGap, col * UnitSize + RowGap * col, UnitSize, UnitSize), 2f, Color.BLACK);
 
                 row++;
@@ -139,15 +139,16 @@ namespace TileMapper
             }
         }
 
-        public Tile GetTileSelected()
+        public int GetTileSelected()
         {
-            return _TileSelcted;
+            return _tileSelected;
         }
 
         public void ChangeTileSet(TileSet ts)
         {
 
             _set = ts;
+            if (_set == null) return;
 
             var dim = _set.GetTileDimensions();
             uint tileNum = dim.Item1 * dim.Item2;
