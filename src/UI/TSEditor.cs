@@ -51,9 +51,11 @@ namespace TileMapper.UI
                     _drawMenuFunc(_core);
                     ImGui.InputText("Name", ref CurrTileSet.Name, 10000);
                     rlImGui.Tooltip("Internal name of the tile to be associated with layers.");
-                    fixed (ushort* ptr = &CurrTileSet.TileWidth) ImGui.InputScalar("Tile Width", ImGuiDataType.U16, (nint)ptr);
+                    fixed (ushort* ptr = &CurrTileSet.TileWidth) if (ImGui.InputScalar("Tile Width", ImGuiDataType.U16, (nint)ptr))
+                        if (CurrTileSet.TileWidth == 0) CurrTileSet.TileWidth = 1; // Divide by 0 error otherwise.
                     rlImGui.Tooltip("Width of each tile in pixels.");
-                    fixed (ushort* ptr = &CurrTileSet.TileHeight) ImGui.InputScalar("Tile Height", ImGuiDataType.U16, (nint)ptr);
+                    fixed (ushort* ptr = &CurrTileSet.TileHeight) if (ImGui.InputScalar("Tile Height", ImGuiDataType.U16, (nint)ptr))
+                        if (CurrTileSet.TileHeight == 0) CurrTileSet.TileHeight = 1; // Divide by 0 error otherwise.
                     rlImGui.Tooltip("Height of each tile in pixels.");
                     fixed (ushort* ptr = &CurrTileSet.TilePaddingX) ImGui.InputScalar("Tile Padding X", ImGuiDataType.U16, (nint)ptr);
                     rlImGui.Tooltip("Padding between each tile horizontally in pixels.");
