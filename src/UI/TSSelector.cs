@@ -62,5 +62,12 @@ namespace TileMapper.UI
                 }
             }
         }
+
+        // Get all tilesets.
+        public IEnumerable<TileSet> AllSets()
+        {
+            return _fnameToSet.Select(x => x.Value);
+        }
+
     }
 }

@@ -8,6 +8,7 @@ namespace TileMapper
         // Variables.
 
         private string _filePath;
+        public string Path => _filePath;
 
         private ushort _rows;
         private ushort _columns;
@@ -19,7 +20,7 @@ namespace TileMapper
         private int _currentLayer;
 
         // Find TileSets from name, used by canvas to draw correct tile.
-        private Dictionary<String, TileSet> _nameToSet;
+        private Dictionary<String, TileSet> _nameToSet = new Dictionary<string, TileSet>();
 
         // Constructor for new map.
         public TileMap(ushort rows, ushort columns, ushort tileWidth, ushort tileHeight)
@@ -33,7 +34,6 @@ namespace TileMapper
             this._tileHeight = tileHeight;
 
             this._layers = new List<TileLayer>();
-            _nameToSet = new Dictionary<string, TileSet>();
 
         }
 
@@ -257,7 +257,12 @@ namespace TileMapper
 
         public void AddTileSet(TileSet ts)
         {
-            _nameToSet.Add(ts.Name, ts);
+            if (!_nameToSet.ContainsKey(ts.Name)) _nameToSet.Add(ts.Name, ts);
+        }
+
+        public void RemoveTileSet(TileSet ts)
+        {
+            if (_nameToSet.ContainsKey(ts.Name)) _nameToSet.Remove(ts.Name);
         }
 
         // Given a name, a TileSet with that name will be returned.

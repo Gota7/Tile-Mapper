@@ -13,7 +13,7 @@ namespace TileMapper.UI
 
         private int _unitSize;
 
-        private TileMap _tMap;
+        public TileMap TileMap { get; private set; }
 
         private TileSelector _ts;
 
@@ -32,12 +32,12 @@ namespace TileMapper.UI
         public Canvas(TileSelector ts, TileMap tMap) : base(0, 0)
         {
 
-            this._tMap = tMap;
+            this.TileMap = tMap;
             this._ts = ts;
 
-            _mapWidth = _tMap.GetRows();
-            _mapHeight = _tMap.GetCols();
-            _unitSize = _tMap.GetUnitWidth();
+            _mapWidth = TileMap.GetRows();
+            _mapHeight = TileMap.GetCols();
+            _unitSize = TileMap.GetUnitWidth();
             _trueWidth = _mapWidth * _unitSize;
             _trueHeight = _mapHeight * _unitSize;
 
@@ -57,69 +57,92 @@ namespace TileMapper.UI
                 _sizeSet = true;
             }
 
-            ImGui.Begin("Canvas", ref _open);
-
-            var size = ImGui.GetContentRegionAvail();
-
-            _currentWidth = size.X;
-            _currentHeight = size.Y;
-            _scaleX = _currentWidth / _trueWidth;
-            _scaleY = _currentHeight / _trueHeight;
-
-            //Console.WriteLine(_currentWidth + " " + _currentWidth + " " + _scaleX + " " + _scaleY + " " + _trueWidth + " " + _trueHeight);
-
-            // Canvas click, tile placement.
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+            if (ImGui.Begin(Path.GetFileNameWithoutExtension(TileMap.Path), ref _open))
             {
 
-                Vector2 windowPos = ImGui.GetWindowPos();
-                Vector2 mousePos = ImGui.GetMousePos();
-
-                int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
-                int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
-
-                //Console.WriteLine(x + " : " + y);
-
-                x = (int)(x / (_unitSize * _scaleX));
-                y = (int)(y / (_unitSize * _scaleY));
-
-                try
+                if (ImGui.BeginTabBar("Tabs", ImGuiTabBarFlags.Reorderable))
                 {
-                    int t = _ts.GetTileSelected();
-                    _tMap.GetCurrentLayer().SetTile((uint)x, (uint)y, t);
+
+                    // Layer tab.
+                    if (ImGui.BeginTabItem("Layers"))
+                    {
+                        ImGui.InputText("Tileset", ref TileMap.GetCurrentLayer().TileSet, 5000);
+                        for (int i = 0; i < TileMap.GetLayerCount(); i++)
+                        {
+                            bool curr = TileMap.GetCurrentLayerIndex() == i;
+                            if (ImGui.Selectable(TileMap.GetLayer(i).TileSet + (curr ? " *" : "") + "##" + i))
+                            {
+                                TileMap.SetCurrentLayer(i);
+                            }
+                        }
+                        ImGui.EndTabItem();
+                    }
+
+                    // Canvas.
+                    if (ImGui.BeginTabItem("Canvas"))
+                    {
+
+                        var size = ImGui.GetContentRegionAvail();
+
+                        _currentWidth = size.X;
+                        _currentHeight = size.Y;
+                        _scaleX = _currentWidth / _trueWidth;
+                        _scaleY = _currentHeight / _trueHeight;
+
+                        //Console.WriteLine(_currentWidth + " " + _currentWidth + " " + _scaleX + " " + _scaleY + " " + _trueWidth + " " + _trueHeight);
+
+                        // Canvas click, tile placement.
+                        if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                        {
+
+                            Vector2 windowPos = ImGui.GetWindowPos();
+                            Vector2 mousePos = ImGui.GetMousePos();
+
+                            int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
+                            int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
+
+                            //Console.WriteLine(x + " : " + y);
+
+                            x = (int)(x / (_unitSize * _scaleX));
+                            y = (int)(y / (_unitSize * _scaleY));
+
+                            try
+                            {
+                                int t = _ts.GetTileSelected();
+                                TileMap.GetCurrentLayer().SetTile((uint)x, (uint)y, t);
+                            }
+                            catch { }
+
+                        }
+
+                        if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
+                        {
+                            Vector2 windowPos = ImGui.GetWindowPos();
+                            Vector2 mousePos = ImGui.GetMousePos();
+
+                            int x = (int)mousePos.X - (int)windowPos.X - 8;
+                            int y = (int)mousePos.Y - (int)windowPos.Y - 27;
+
+                            //Console.WriteLine(x + " : " + y);
+
+                            x = (int)(x / (_unitSize * _scaleX));
+                            y = (int)(y / (_unitSize * _scaleY));
+
+                            try
+                            {
+                                TileMap.GetCurrentLayer().SetTile((uint)x, (uint)y, -1);
+                            }
+                            catch { }
+                        }
+
+                        // Draw target.
+                        DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
+                        ImGui.EndTabItem();
+                    }
+                    ImGui.EndTabBar();
                 }
-                catch { }
-
+                ImGui.End();
             }
-
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
-            {
-                Vector2 windowPos = ImGui.GetWindowPos();
-                Vector2 mousePos = ImGui.GetMousePos();
-
-                int x = (int)mousePos.X - (int)windowPos.X - 8;
-                int y = (int)mousePos.Y - (int)windowPos.Y - 27;
-
-                //Console.WriteLine(x + " : " + y);
-
-                x = (int)(x / (_unitSize * _scaleX));
-                y = (int)(y / (_unitSize * _scaleY));
-
-                try
-                {
-                    _tMap.GetCurrentLayer().SetTile((uint)x, (uint)y, -1);
-                }
-                catch { }
-            }
-
-            // Draw target.
-            DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
-
-            ImGui.End();
-        }
-
-        public override void Update()
-        {
         }
 
         // Draw according to trueSize not current.
@@ -129,11 +152,11 @@ namespace TileMapper.UI
             Raylib.ClearBackground(Color.DARKBLUE);
 
             // Draw each layer.
-            for (int k = 0; k < _tMap.GetLayerCount(); k++)
+            for (int k = 0; k < TileMap.GetLayerCount(); k++)
             {
 
-                TileLayer layer = _tMap.GetLayer(k);
-                var set = _tMap.NameToSet(layer.TileSet);
+                TileLayer layer = TileMap.GetLayer(k);
+                var set = TileMap.NameToSet(layer.TileSet);
 
                 for (uint i = 0; i < _mapWidth; i++)
                 {
@@ -177,6 +200,10 @@ namespace TileMapper.UI
             var v = ImGui.GetWindowContentRegionMin();
             _windowPadding = (int)v.X;
             _windowPaddingTop = (int)v.Y;
+        }
+
+        public override void Close() {
+            base.Close();
         }
 
     }
