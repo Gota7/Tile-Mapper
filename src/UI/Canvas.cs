@@ -4,7 +4,7 @@ using ImGuiNET;
 using System.Numerics;
 using Tile_Mapper;
 
-namespace TileMapper
+namespace TileMapper.UI
 {
 
     public class Canvas : GraphicsWindow

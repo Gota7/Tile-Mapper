@@ -17,11 +17,17 @@ namespace TileMapper.UI
 
         // Open file dialogs.
         private FileDialog _fileDialog = null;
-        private int _fileDialogMode = 0; // 0 - Main window open file.
+        private int _fileDialogMode = 0; // 0 - Main window open file. 1 - Tileset image. 2 - Tileset path.
+        private string _fileDialogImageTmp;
+
+        // Tile selecting.
+        private TileSelector _tsSelector = new TileSelector();
+        private string _lastTileSet = "";
 
         public void DoDraw()
         {
             if (_tsEditor != null) _tsEditor.DoDraw();
+            _tsSelector.DoDraw();
         }
 
         public override void DrawUI()
@@ -34,6 +40,8 @@ namespace TileMapper.UI
                 {
                     if (ImGui.MenuItem("New Tileset"))
                     {
+                        _fileDialog = new FileDialog("TileMapper", FileDialogMode.OpenFile, "Image|*.png;*.jpg;*.gif");
+                        _fileDialogMode = 1;
                     }
                     if (ImGui.MenuItem("New Tilemap"))
                     {
@@ -73,17 +81,21 @@ namespace TileMapper.UI
                 _fileDialog.DrawUI();
                 if (!_fileDialog.Open && !_fileDialog.SelectedItem.Equals(""))
                 {
+                    string item = _fileDialog.SelectedItem;
+                    _fileDialog = null;
                     switch (_fileDialogMode)
                     {
-                        case 0: OpenFileCallback(_fileDialog.SelectedItem); break;
+                        case 0: OpenFileCallback(item); break;
+                        case 1: NewTileSetImage(item); break;
+                        case 2: NewTileSet(_fileDialogImageTmp, item); break;
                     }
-                    _fileDialog = null;
-                }
+                } else if (!_fileDialog.Open) _fileDialog = null;
             }
 
             // Draw other UIs.
             if (_tsEditor != null && _tsEditor.CurrTileSet != null) _tsEditor.DrawUI();
             if (_selectorShown) _selector.DrawUI();
+            _tsSelector.DrawUI();
 
         }
 
@@ -95,8 +107,11 @@ namespace TileMapper.UI
 
             // Update other UIs.
             _selector.Update();
+            if (!_lastTileSet.Equals(_selector.CurrTileset)) _tsSelector.ChangeTileSet(_selector.CurrTilesetData);
             _tsEditor.CurrTileSet = _selector.CurrTilesetData;
+            _lastTileSet = _selector.CurrTileset;
             _tsEditor.Update();
+            _tsSelector.Update();
 
         }
 
@@ -120,6 +135,21 @@ namespace TileMapper.UI
         {
             if (item.EndsWith(".tms")) OpenTileSet(item);
             else if (item.EndsWith(".tmm")) OpenTileMap(item);
+        }
+
+        // Launch next stage of tileset creator.
+        private void NewTileSetImage(string image)
+        {
+            _fileDialogImageTmp = image;
+            _fileDialog = new FileDialog("TileMapper", FileDialogMode.SaveFile, "Tile-Mapper Tileset|*.tms");
+            _fileDialogMode = 2;
+        }
+
+        // Create a new tileset.
+        private void NewTileSet(string image, string path)
+        {
+            TileSet ts = new TileSet(image, "New Tileset");
+            if (_selector.AddTileset(path, ts)) ts.Save(path); // Only save if successful in adding.
         }
 
         // Open a tileset.
