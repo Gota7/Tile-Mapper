@@ -2,6 +2,7 @@ using TileMapper.Windowing;
 using Raylib_cs;
 using ImGuiNET;
 using System.Numerics;
+using Tile_Mapper;
 
 namespace TileMapper
 {
@@ -16,6 +17,9 @@ namespace TileMapper
         private TileMap _tMap;
 
         private TileSelector _ts;
+
+        private MapAction _currentAction;
+        private UndoLog _actionLog;
 
         private int _trueWidth, _trueHeight;
         private float _currentWidth, _currentHeight;
@@ -40,6 +44,9 @@ namespace TileMapper
             _unitSize = _tMap.GetUnitWidth();
             _trueWidth = _mapWidth * _unitSize;
             _trueHeight = _mapHeight * _unitSize;
+
+            _currentAction = new PlaceAction();
+            _actionLog = new UndoLog(20);
 
             this.ResizeRenderTarget(_trueWidth, _trueHeight);
         }
@@ -68,50 +75,6 @@ namespace TileMapper
 
             //Console.WriteLine(_currentWidth + " " + _currentWidth + " " + _scaleX + " " + _scaleY + " " + _trueWidth + " " + _trueHeight);
 
-            // Canvas click, tile placement.
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
-            {
-
-                Vector2 windowPos = ImGui.GetWindowPos();
-                Vector2 mousePos = ImGui.GetMousePos();
-
-                int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
-                int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
-
-                //Console.WriteLine(x + " : " + y);
-
-                x = (int)(x / (_unitSize * _scaleX));
-                y = (int)(y / (_unitSize * _scaleY));
-
-                try
-                {
-                    int t = _ts.GetTileSelected();
-                    _tMap.GetCurrentLayer().SetTile((uint)x, (uint)y, t);
-                }
-                catch { }
-
-            }
-
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
-            {
-                Vector2 windowPos = ImGui.GetWindowPos();
-                Vector2 mousePos = ImGui.GetMousePos();
-
-                int x = (int)mousePos.X - (int)windowPos.X - 8;
-                int y = (int)mousePos.Y - (int)windowPos.Y - 27;
-
-                //Console.WriteLine(x + " : " + y);
-
-                x = (int)(x / (_unitSize * _scaleX));
-                y = (int)(y / (_unitSize * _scaleY));
-
-                try
-                {
-                    _tMap.GetCurrentLayer().SetTile((uint)x, (uint)y, -1);
-                }
-                catch { }
-            }
-
             // Draw target.
             DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
 
@@ -120,6 +83,27 @@ namespace TileMapper
 
         public override void Update()
         {
+            // Determine where mouse is.
+            Vector2 windowPos = ImGui.GetWindowPos();
+            Vector2 mousePos = ImGui.GetMousePos();
+
+            int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
+            int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
+
+            x = (int)(x / (_unitSize * _scaleX));
+            y = (int)(y / (_unitSize * _scaleY));
+
+            //Check if coordinates valid
+            if(x >= 0 && x < _tMap.GetRows()
+                && y >= 0 && y < _tMap.GetCols())
+            {
+                _currentAction.Update((uint)x, (uint)y, _tMap.GetCurrentLayer(), _ts.GetTileSelected());
+
+                if(_currentAction.CanGenerate())
+                {
+                    _actionLog.AddAction(_currentAction.GenerateAction());
+                }
+            }
         }
 
         // Draw according to trueSize not current.
