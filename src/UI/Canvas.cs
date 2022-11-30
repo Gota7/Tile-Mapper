@@ -2,6 +2,7 @@ using TileMapper.Windowing;
 using Raylib_cs;
 using ImGuiNET;
 using System.Numerics;
+using rlImGui_cs;
 
 namespace TileMapper.UI
 {
@@ -10,8 +11,6 @@ namespace TileMapper.UI
     {
 
         private int _mapHeight, _mapWidth;
-
-        private int _unitSize;
 
         public TileMap TileMap { get; private set; }
 
@@ -26,6 +25,13 @@ namespace TileMapper.UI
         private bool _sizeSet = false;
 
         private int _windowPadding, _windowPaddingTop;
+        private string _windowName = "";
+        private static int _newTileMapNumber = 1;
+
+        private ushort _resizeX;
+        private ushort _resizeY;
+
+        private FileDialog _fd = null;
 
 
         // The width and height should be that of the tile map.
@@ -34,17 +40,19 @@ namespace TileMapper.UI
 
             this.TileMap = tMap;
             this._ts = ts;
+            ResetSize();
+        }
 
-            _mapWidth = TileMap.GetRows();
-            _mapHeight = TileMap.GetCols();
-            _unitSize = TileMap.GetUnitWidth();
-            _trueWidth = _mapWidth * _unitSize;
-            _trueHeight = _mapHeight * _unitSize;
-
+        private void ResetSize()
+        {
+            _mapWidth = _resizeX = TileMap.GetRows();
+            _mapHeight = _resizeY = TileMap.GetCols();
+            _trueWidth = _mapWidth * TileMap.TileWidth;
+            _trueHeight = _mapHeight * TileMap.TileHeight;
             this.ResizeRenderTarget(_trueWidth, _trueHeight);
         }
 
-        public override void DrawUI()
+        public override unsafe void DrawUI()
         {
 
             GetWindowPadding();
@@ -57,16 +65,57 @@ namespace TileMapper.UI
                 _sizeSet = true;
             }
 
-            if (ImGui.Begin(Path.GetFileNameWithoutExtension(TileMap.Path), ref _open))
+            string windowName = Path.GetFileNameWithoutExtension(TileMap.Path);
+            if (windowName.Equals("")) windowName = _windowName;
+            if (windowName.Equals("")) windowName = "New Tilemap " + _newTileMapNumber++;
+            _windowName = windowName;
+            if (ImGui.Begin(windowName, ImGuiWindowFlags.MenuBar))
             {
+
+                // Menu bar.
+                if (ImGui.BeginMenuBar())
+                {
+                    if (ImGui.MenuItem("Save")) Save();
+                    if (ImGui.MenuItem("Save As")) SaveAs();
+                    if (ImGui.MenuItem("Close")) Close();
+                    ImGui.EndMenuBar();
+                }
 
                 if (ImGui.BeginTabBar("Tabs", ImGuiTabBarFlags.Reorderable))
                 {
 
+                    // Tilemap properties.
+                    if (ImGui.BeginTabItem("Properties"))
+                    {
+                        fixed (ushort* ptr = &TileMap.TileWidth) if (ImGui.InputScalar("Tile Width", ImGuiDataType.U16, (nint)ptr))
+                        {
+                            if (TileMap.TileWidth == 0) TileMap.TileWidth = 1; // Divide by 0 error otherwise.
+                            ResetSize();
+                        }
+                        rlImGui.Tooltip("Width of each tile in pixels.");
+                        fixed (ushort* ptr = &TileMap.TileHeight) if (ImGui.InputScalar("Tile Height", ImGuiDataType.U16, (nint)ptr))
+                        {
+                            if (TileMap.TileHeight == 0) TileMap.TileHeight = 1; // Divide by 0 error otherwise.
+                            ResetSize();
+                        }
+                        rlImGui.Tooltip("Height of each tile in pixels.");
+                        fixed (ushort* ptr = &_resizeX) if (ImGui.InputScalar("Width", ImGuiDataType.U16, (nint)ptr))
+                            if (_resizeX == 0) _resizeX = 1;
+                        fixed (ushort* ptr = &_resizeY) if (ImGui.InputScalar("Height", ImGuiDataType.U16, (nint)ptr))
+                            if (_resizeY == 0) _resizeY = 1;
+                        if (ImGui.Button("Resize"))
+                        {
+                            TileMap.Resize(_resizeX, _resizeY);
+                            ResetSize();
+                        }
+                        rlImGui.Tooltip("Resize the tile map.");
+                        ImGui.EndTabItem();
+                    }
+
                     // Layer tab.
                     if (ImGui.BeginTabItem("Layers"))
                     {
-                        ImGui.InputText("Tileset", ref TileMap.GetCurrentLayer().TileSet, 5000);
+                        if (TileMap.GetCurrentLayerIndex() != -1) ImGui.InputText("Tileset", ref TileMap.GetCurrentLayer().TileSet, 5000);
                         for (int i = 0; i < TileMap.GetLayerCount(); i++)
                         {
                             bool curr = TileMap.GetCurrentLayerIndex() == i;
@@ -103,8 +152,8 @@ namespace TileMapper.UI
 
                             //Console.WriteLine(x + " : " + y);
 
-                            x = (int)(x / (_unitSize * _scaleX));
-                            y = (int)(y / (_unitSize * _scaleY));
+                            x = (int)(x / (TileMap.TileWidth * _scaleX));
+                            y = (int)(y / (TileMap.TileHeight * _scaleY));
 
                             try
                             {
@@ -125,8 +174,8 @@ namespace TileMapper.UI
 
                             //Console.WriteLine(x + " : " + y);
 
-                            x = (int)(x / (_unitSize * _scaleX));
-                            y = (int)(y / (_unitSize * _scaleY));
+                            x = (int)(x / (TileMap.TileWidth * _scaleX));
+                            y = (int)(y / (TileMap.TileHeight * _scaleY));
 
                             try
                             {
@@ -143,6 +192,7 @@ namespace TileMapper.UI
                 }
                 ImGui.End();
             }
+            DoSaveAs();
         }
 
         // Draw according to trueSize not current.
@@ -172,8 +222,8 @@ namespace TileMapper.UI
                         if (t != -1)
                         {
                             //Raylib.DrawRectangle(i*_unitSize,j*_unitSize,_unitSize,_unitSize,Color.DARKGREEN);
-                            float scale = (float)_unitSize / set.TileWidth;
-                            set.Draw(i * _unitSize, j * _unitSize, (uint)t, scale);
+                            float scaleX = (float)TileMap.TileWidth / set.TileWidth;
+                            set.Draw(i * TileMap.TileWidth, j * TileMap.TileHeight, (uint)t, scaleX);
                         }
                     }
                 }
@@ -190,7 +240,7 @@ namespace TileMapper.UI
                 for (uint j = 0; j < _mapHeight; j++)
                 {
                     // Draw tile borders.
-                    Raylib.DrawRectangleLinesEx(new Rectangle(i * _unitSize, j * _unitSize, _unitSize, _unitSize), 0.5f, Color.BLACK);
+                    Raylib.DrawRectangleLinesEx(new Rectangle(i * TileMap.TileWidth, j * TileMap.TileHeight, TileMap.TileWidth, TileMap.TileHeight), 0.5f, Color.BLACK);
                 }
             }
         }
@@ -202,8 +252,28 @@ namespace TileMapper.UI
             _windowPaddingTop = (int)v.Y;
         }
 
-        public override void Close() {
-            base.Close();
+        private void Save()
+        {
+            if (TileMap.Path.Equals("")) SaveAs();
+            else TileMap.Save();
+        }
+
+        private void SaveAs()
+        {
+            _fd = new FileDialog("Canvas", FileDialogMode.SaveFile, "Tile-Mapper Tilemap|*.tmm");
+        }
+
+        private void DoSaveAs()
+        {
+            if (_fd != null)
+            {
+                _fd.DrawUI();
+                if (!_fd.Open && !_fd.SelectedItem.Equals(""))
+                {
+                    TileMap.Save(_fd.SelectedItem);
+                    _fd = null;
+                } else if (!_fd.Open) _fd = null;
+            }
         }
 
     }

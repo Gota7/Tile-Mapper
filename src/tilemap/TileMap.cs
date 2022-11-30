@@ -7,17 +7,17 @@ namespace TileMapper
     {
         // Variables.
 
-        private string _filePath;
+        private string _filePath = "";
         public string Path => _filePath;
 
         private ushort _rows;
         private ushort _columns;
 
-        private ushort _tileWidth;
-        private ushort _tileHeight;
+        public ushort TileWidth;
+        public ushort TileHeight;
 
-        private List<TileLayer> _layers;
-        private int _currentLayer;
+        private List<TileLayer> _layers = new List<TileLayer>();
+        private int _currentLayer = -1;
 
         // Find TileSets from name, used by canvas to draw correct tile.
         private Dictionary<String, TileSet> _nameToSet = new Dictionary<string, TileSet>();
@@ -25,16 +25,10 @@ namespace TileMapper
         // Constructor for new map.
         public TileMap(ushort rows, ushort columns, ushort tileWidth, ushort tileHeight)
         {
-            this._filePath = "";
-            this._currentLayer = -1;
-
             this._rows = rows;
             this._columns = columns;
-            this._tileWidth = tileWidth;
-            this._tileHeight = tileHeight;
-
-            this._layers = new List<TileLayer>();
-
+            this.TileWidth = tileWidth;
+            this.TileHeight = tileHeight;
         }
 
         // Constructor that loads from file.
@@ -57,8 +51,8 @@ namespace TileMapper
                     {
                         _rows = r.ReadUInt16();
                         _columns = r.ReadUInt16();
-                        _tileWidth = r.ReadUInt16();
-                        _tileHeight = r.ReadUInt16();
+                        TileWidth = r.ReadUInt16();
+                        TileHeight = r.ReadUInt16();
                         int numLayers = r.ReadInt32();
                         _layers = new List<TileLayer>();
                         for (int i = 0; i < numLayers; i++)
@@ -201,23 +195,6 @@ namespace TileMapper
             }
         }
 
-        // Method to resize tile pixels.
-        public void SetUnitSize(ushort newWidth, ushort newHeight)
-        {
-            this._tileWidth = newWidth;
-            this._tileHeight = newHeight;
-        }
-
-        public ushort GetUnitWidth()
-        {
-            return _tileWidth;
-        }
-
-        public ushort GetUnitHeight()
-        {
-            return _tileHeight;
-        }
-
         // Method to save current TileMap to a new file path.
         public void Save(string filePath)
         {
@@ -236,8 +213,8 @@ namespace TileMapper
                     {
                         w.Write(_rows);
                         w.Write(_columns);
-                        w.Write(_tileWidth);
-                        w.Write(_tileHeight);
+                        w.Write(TileWidth);
+                        w.Write(TileHeight);
                         w.Write(_layers.Count);
                         foreach (var layer in _layers)
                         {
