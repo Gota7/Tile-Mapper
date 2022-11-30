@@ -59,11 +59,6 @@ namespace TileMapper.UI
         public string SelectedItem = "";
 
         /// <summary>
-        /// If it has been selected and confirmed.
-        /// </summary>
-        private bool _ok = false;
-
-        /// <summary>
         /// Name of the window.
         /// </summary>
         private string _name = "Open File:";
@@ -99,7 +94,6 @@ namespace TileMapper.UI
             }
             Mode = mode;
             FileName = defaultFileName;
-            _ok = false;
 
             // Filters if not dir mode.
             if (Mode != FileDialogMode.Directory)
@@ -342,7 +336,6 @@ namespace TileMapper.UI
                             {
 
                                 // It's ok.
-                                _ok = true;
                                 _open = false;
 
                             }
@@ -462,7 +455,6 @@ namespace TileMapper.UI
                     }
 
                     // Set ok.
-                    _ok = true;
                     _open = false;
 
                 }

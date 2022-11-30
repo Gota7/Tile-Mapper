@@ -13,7 +13,7 @@ namespace TileMapper.UI
         private bool _selectorShown = true;
 
         // Tile set editor.
-        private TSEditor _tsEditor = new TSEditor();
+        private TSEditor _tsEditor = null;
 
         // Open file dialogs.
         private FileDialog _fileDialog = null;
@@ -21,7 +21,7 @@ namespace TileMapper.UI
 
         public void DoDraw()
         {
-            _tsEditor.DoDraw();
+            if (_tsEditor != null) _tsEditor.DoDraw();
         }
 
         public override void DrawUI()
@@ -82,13 +82,16 @@ namespace TileMapper.UI
             }
 
             // Draw other UIs.
-            if (_tsEditor.CurrTileSet != null) _tsEditor.DrawUI();
+            if (_tsEditor != null && _tsEditor.CurrTileSet != null) _tsEditor.DrawUI();
             if (_selectorShown) _selector.DrawUI();
 
         }
 
         public override void Update()
         {
+
+            // Initialize needed handlers (can't do this in constructors because &this doesn't exist until end of constructor).
+            if (_tsEditor == null) _tsEditor = new TSEditor(DrawTilesetEditorMenu, this);
 
             // Update other UIs.
             _selector.Update();
@@ -129,6 +132,28 @@ namespace TileMapper.UI
         private void OpenTileMap(string tmm)
         {
             // TODO!!!
+        }
+
+        // Draw the menu for the tileset editor.
+        private static void DrawTilesetEditorMenu(Core core) {
+            if (ImGui.BeginMenuBar())
+            {
+                if (ImGui.MenuItem("Save"))
+                {
+                    core._selector.CurrTilesetData.Save(core._selector.CurrTileset);
+                }
+                if (ImGui.MenuItem("Close"))
+                {
+                    core._selector.RemoveTileset(core._selector.CurrTileset);
+                }
+                if (ImGui.MenuItem("Delete"))
+                {
+                    string currTileset = core._selector.CurrTileset;
+                    core._selector.RemoveTileset(currTileset);
+                    File.Delete(currTileset);
+                }
+                ImGui.EndMenuBar();
+            }
         }
 
     }

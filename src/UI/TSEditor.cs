@@ -7,6 +7,9 @@ using TileMapper.Windowing;
 namespace TileMapper.UI
 {
 
+    // Delegate type for drawing tileset editor menu.
+    public delegate void TSEditorDrawMenuFunc(Core core);
+
     // An editor for tilesets.
     public class TSEditor : GraphicsWindow
     {
@@ -26,17 +29,26 @@ namespace TileMapper.UI
         // For selecting files.
         private FileDialog _fd = null;
 
+        // Callback for executing the menu.
+        private TSEditorDrawMenuFunc _drawMenuFunc;
+        private Core _core;
+
         // Make a new tileset editor.
-        public TSEditor() : base(DEFAULT_SIZE, DEFAULT_SIZE) {}
+        public TSEditor(TSEditorDrawMenuFunc drawMenuFunc, Core core) : base(DEFAULT_SIZE, DEFAULT_SIZE)
+        {
+            _drawMenuFunc = drawMenuFunc;
+            _core = core;
+        }
 
         public override unsafe void DrawUI()
         {
             Vector2 size = CurrTileSet == null ? new Vector2(DEFAULT_SIZE, DEFAULT_SIZE) : CurrTileSet.TextureSize;
             size *= _scale;
-            if (ImGui.Begin("Tilset Editor", ImGuiWindowFlags.AlwaysHorizontalScrollbar | ImGuiWindowFlags.AlwaysVerticalScrollbar | ImGuiWindowFlags.AlwaysAutoResize))
+            if (ImGui.Begin("Tilset Editor", ImGuiWindowFlags.AlwaysHorizontalScrollbar | ImGuiWindowFlags.AlwaysVerticalScrollbar | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.MenuBar))
             {
                 if (CurrTileSet != null)
                 {
+                    _drawMenuFunc(_core);
                     ImGui.InputText("Name", ref CurrTileSet.Name, 10000);
                     rlImGui.Tooltip("Internal name of the tile to be associated with layers.");
                     fixed (ushort* ptr = &CurrTileSet.TileWidth) ImGui.InputScalar("Tile Width", ImGuiDataType.U16, (nint)ptr);
@@ -60,7 +72,7 @@ namespace TileMapper.UI
             if (_fd != null) // Check for any images selected.
             {
                 _fd.DrawUI();
-                if (!_fd.Open && _fd.SelectedItem.Equals(""))
+                if (!_fd.Open && !_fd.SelectedItem.Equals(""))
                 {
                     ChangeImage(_fd.SelectedItem);
                     _fd = null;
@@ -80,14 +92,14 @@ namespace TileMapper.UI
                 int currX = CurrTileSet.TileInitialSpacingX;
                 int currY = CurrTileSet.TileInitialSpacingY;
                 var dims = CurrTileSet.GetTileDimensions();
-                for (uint i = 0; i < dims.Item1; i++)
+                for (uint i = 0; i <= dims.Item1; i++)
                 {
                     Raylib.DrawLine(currX, 0, currX, (int)_lastSize.Y, Color.RED);
                     currX += CurrTileSet.TileWidth;
                     if (CurrTileSet.TilePaddingX != 0) Raylib.DrawLine(currX, 0, currX, (int)_lastSize.Y, Color.RED);
                     currX += CurrTileSet.TilePaddingX;
                 }
-                for (uint i = 0; i < dims.Item2; i++)
+                for (uint i = 0; i <= dims.Item2; i++)
                 {
                     Raylib.DrawLine(0, currY, (int)_lastSize.X, currY, Color.RED);
                     currY += CurrTileSet.TileHeight;
