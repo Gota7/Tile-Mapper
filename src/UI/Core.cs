@@ -20,9 +20,14 @@ namespace TileMapper.UI
         private int _fileDialogMode = 0; // 0 - Main window open file. 1 - Tileset image. 2 - Tileset path.
         private string _fileDialogImageTmp;
 
+        // Tile selecting.
+        private TileSelector _tsSelector = new TileSelector();
+        private string _lastTileSet = "";
+
         public void DoDraw()
         {
             if (_tsEditor != null) _tsEditor.DoDraw();
+            _tsSelector.DoDraw();
         }
 
         public override void DrawUI()
@@ -90,6 +95,7 @@ namespace TileMapper.UI
             // Draw other UIs.
             if (_tsEditor != null && _tsEditor.CurrTileSet != null) _tsEditor.DrawUI();
             if (_selectorShown) _selector.DrawUI();
+            _tsSelector.DrawUI();
 
         }
 
@@ -101,8 +107,11 @@ namespace TileMapper.UI
 
             // Update other UIs.
             _selector.Update();
+            if (!_lastTileSet.Equals(_selector.CurrTileset)) _tsSelector.ChangeTileSet(_selector.CurrTilesetData);
             _tsEditor.CurrTileSet = _selector.CurrTilesetData;
+            _lastTileSet = _selector.CurrTileset;
             _tsEditor.Update();
+            _tsSelector.Update();
 
         }
 

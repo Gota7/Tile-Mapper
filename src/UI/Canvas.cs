@@ -3,7 +3,7 @@ using Raylib_cs;
 using ImGuiNET;
 using System.Numerics;
 
-namespace TileMapper
+namespace TileMapper.UI
 {
 
     public class Canvas : GraphicsWindow

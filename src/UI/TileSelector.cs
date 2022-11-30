@@ -3,7 +3,7 @@ using Raylib_cs;
 using ImGuiNET;
 using System.Numerics;
 
-namespace TileMapper
+namespace TileMapper.UI
 {
 
     public class TileSelector : GraphicsWindow
@@ -59,6 +59,7 @@ namespace TileMapper
 
         public override void DrawUI()
         {
+            if (_set == null) return;
 
             GetWindowPadding();
 
@@ -78,34 +79,34 @@ namespace TileMapper
             _scaleY = _currentHeight / _trueHeight;
 
             // TileSelector click, tile selection.
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && ImGui.IsWindowHovered())
+            var currPos = ImGui.GetCursorPos();
+            if (ImGui.IsMouseDown(ImGuiMouseButton.Left) && ImGui.IsWindowFocused())
             {
 
                 Vector2 windowPos = ImGui.GetWindowPos();
                 Vector2 mousePos = ImGui.GetMousePos();
-
                 int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
                 int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
-
-                x = (int)(x / ((UnitSize + TileGap) * _scaleX));
-                y = (int)(y / ((UnitSize + RowGap) * _scaleY));
-
-                if (x >= 0 && y >= 0)
+                if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight)
                 {
-                    int tileIndex = x + y * TilesPerRow;
-                    _tileSelected = _tileList[tileIndex];
+                    x = (int)(x / ((UnitSize + TileGap) * _scaleX));
+                    y = (int)(y / ((UnitSize + RowGap) * _scaleY));
+
+                    if (x >= 0 && y >= 0)
+                    {
+                        int tileIndex = x + y * TilesPerRow;
+                        var dims = _set.GetTileDimensions();
+                        _tileSelected = tileIndex >= (dims.Item1 * dims.Item2) ? -1 : _tileList[tileIndex];
+                    }
                 }
 
             }
 
+            ImGui.InvisibleButton("NoDrag", new Vector2(_currentWidth, _currentHeight)); // Prevent dragging of window.
+            ImGui.SetCursorPos(currPos);
             DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
 
             ImGui.End();
-        }
-
-        public override void Update()
-        {
-
         }
 
         protected override void Draw()
@@ -147,6 +148,7 @@ namespace TileMapper
         {
 
             _set = ts;
+            if (_set == null) return;
 
             var dim = _set.GetTileDimensions();
             uint tileNum = dim.Item1 * dim.Item2;
