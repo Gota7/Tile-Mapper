@@ -60,7 +60,7 @@ namespace TileMapper.UI
 
             if (!_sizeSet)
             {
-                ImGui.SetNextWindowSize(new Vector2(_trueWidth + 2*_windowPadding, _trueHeight + _windowPaddingTop + _windowPadding));
+                ImGui.SetNextWindowSize(new Vector2(_trueWidth + 2 * _windowPadding, _trueHeight + _windowPaddingTop + _windowPadding));
                 _sizeSet = true;
             }
 
@@ -74,6 +74,36 @@ namespace TileMapper.UI
             _scaleY = _currentHeight / _trueHeight;
 
             //Console.WriteLine(_currentWidth + " " + _currentWidth + " " + _scaleX + " " + _scaleY + " " + _trueWidth + " " + _trueHeight);
+
+            if (ImGui.BeginMainMenuBar())
+            {
+                if (ImGui.BeginMenu("Edit"))
+                {
+                    if (ImGui.MenuItem("Undo"))
+                    {
+                        // Interupting to ensure undo will not mess with the action.
+                        _currentAction.Interrupt();
+
+                        if (_currentAction.CanGenerate())
+                        {
+                            _actionLog.AddAction(_currentAction.GenerateAction());
+                        }
+                        _actionLog.Undo();
+                    }
+                    if (ImGui.MenuItem("Redo"))
+                    {
+                        _currentAction.Interrupt();
+
+                        if (_currentAction.CanGenerate())
+                        {
+                            _actionLog.AddAction(_currentAction.GenerateAction());
+                        }
+                        _actionLog.Redo();
+                    }
+                    ImGui.EndMenu();
+                }
+                ImGui.EndMainMenuBar();
+            }
 
             // Draw target.
             DrawRenderTarget((int)_currentWidth, (int)_currentHeight);

@@ -58,7 +58,7 @@ namespace Tile_Mapper
         {
             // Canvas click, tile placement.
 
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left)
+            if (ImGui.IsMouseDown(ImGuiMouseButton.Left)
                 && (!_startedPlacing || !_isRemoving))
             {
                 _startedPlacing = true;
@@ -71,7 +71,7 @@ namespace Tile_Mapper
                     layer.SetTile(x, y, tile);
                 }
             }
-            else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right)
+            else if (ImGui.IsMouseDown(ImGuiMouseButton.Right)
                 && (!_startedPlacing || _isRemoving))
             {
                 _startedPlacing = true;
