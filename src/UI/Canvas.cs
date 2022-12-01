@@ -83,6 +83,15 @@ namespace TileMapper.UI
 
                 if (ImGui.BeginMenuBar())
                 {
+
+                    if (ImGui.BeginMenu("File"))
+                    {
+                        if (ImGui.MenuItem("Save")) Save();
+                        if (ImGui.MenuItem("Save As")) SaveAs();
+                        if (ImGui.MenuItem("Close")) Close();
+
+                        ImGui.EndMenu();
+                    }
                     if (ImGui.BeginMenu("Edit"))
                     {
                         if (ImGui.MenuItem("Undo"))
@@ -107,11 +116,8 @@ namespace TileMapper.UI
                             _actionLog.Redo();
                         }
                         ImGui.EndMenu();
-                        if (ImGui.MenuItem("Save")) Save();
-                        if (ImGui.MenuItem("Save As")) SaveAs();
-                        if (ImGui.MenuItem("Close")) Close();
-                        ImGui.EndMenuBar();
                     }
+                    ImGui.EndMenuBar();
 
                     if (ImGui.BeginTabBar("Tabs", ImGuiTabBarFlags.Reorderable))
                     {
