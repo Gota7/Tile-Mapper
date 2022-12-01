@@ -167,7 +167,8 @@ namespace TileMapper.UI
                         //Console.WriteLine(_currentWidth + " " + _currentWidth + " " + _scaleX + " " + _scaleY + " " + _trueWidth + " " + _trueHeight);
 
                         // Canvas click, tile placement.
-                        if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                        var currPos = ImGui.GetCursorPos();
+                        if (ImGui.IsMouseDown(ImGuiMouseButton.Left) && ImGui.IsWindowFocused())
                         {
 
                             Vector2 windowPos = ImGui.GetWindowPos();
@@ -175,42 +176,54 @@ namespace TileMapper.UI
 
                             int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
                             int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
-
-                            //Console.WriteLine(x + " : " + y);
-
-                            x = (int)(x / (TileMap.TileWidth * _scaleX));
-                            y = (int)(y / (TileMap.TileHeight * _scaleY));
-
-                            try
+                            if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight)
                             {
-                                int t = _ts.GetTileSelected();
-                                TileMap.GetCurrentLayer().SetTile((uint)x, (uint)y, t);
+
+                                //Console.WriteLine(x + " : " + y);
+
+
+                                x = (int)(x / (TileMap.TileWidth * _scaleX));
+                                y = (int)(y / (TileMap.TileHeight * _scaleY));
+
+
+                                try
+                                {
+                                    int t = _ts.GetTileSelected();
+                                    TileMap.GetCurrentLayer().SetTile((uint)x, (uint)y, t);
+                                }
+                                catch { }
                             }
-                            catch { }
 
                         }
 
-                        if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
+                        if (ImGui.IsMouseDown(ImGuiMouseButton.Right) && ImGui.IsWindowFocused())
                         {
                             Vector2 windowPos = ImGui.GetWindowPos();
                             Vector2 mousePos = ImGui.GetMousePos();
 
-                            int x = (int)mousePos.X - (int)windowPos.X - 8;
-                            int y = (int)mousePos.Y - (int)windowPos.Y - 27;
-
-                            //Console.WriteLine(x + " : " + y);
-
-                            x = (int)(x / (TileMap.TileWidth * _scaleX));
-                            y = (int)(y / (TileMap.TileHeight * _scaleY));
-
-                            try
+                            int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
+                            int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
+                            if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight)
                             {
-                                TileMap.GetCurrentLayer().SetTile((uint)x, (uint)y, -1);
+
+                                //Console.WriteLine(x + " : " + y);
+
+
+                                x = (int)(x / (TileMap.TileWidth * _scaleX));
+                                y = (int)(y / (TileMap.TileHeight * _scaleY));
+
+
+                                try
+                                {
+                                    TileMap.GetCurrentLayer().SetTile((uint)x, (uint)y, -1);
+                                }
+                                catch { }
                             }
-                            catch { }
                         }
 
                         // Draw target.
+                        ImGui.InvisibleButton("NoDrag", new Vector2(_currentWidth, _currentHeight));
+                        ImGui.SetCursorPos(currPos); // Prevent dragging with invisible button and put cursor back in place.
                         DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
                         ImGui.EndTabItem();
                     }
