@@ -123,6 +123,26 @@ namespace TileMapper.UI
                             {
                                 TileMap.SetCurrentLayer(i);
                             }
+                            ImGui.SameLine();
+                            if (i > 0 && ImGui.Button("↑"))
+                            {
+                                TileMap.SwapLayers(i - 1, i);
+                                ImGui.SameLine();
+                            }
+                            if (i < TileMap.GetLayerCount() && ImGui.Button("↓"))
+                            {
+                                TileMap.SwapLayers(i, i + 1);
+                                ImGui.SameLine();
+                            }
+                            if (ImGui.Button("-"))
+                            {
+                                TileMap.DeleteLayer(i);
+                                break;
+                            }
+                        }
+                        if (ImGui.Button("Add Layer"))
+                        {
+                            TileMap.AddLayer("TilesetHere");
                         }
                         ImGui.EndTabItem();
                     }
