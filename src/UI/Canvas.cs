@@ -49,6 +49,7 @@ namespace TileMapper.UI
             _actionLog = new UndoLog(20);
         }
 
+
         private void ResetSize()
         {
             _mapWidth = _resizeX = TileMap.GetRows();
@@ -79,204 +80,159 @@ namespace TileMapper.UI
             {
 
                 // Menu bar.
+
                 if (ImGui.BeginMenuBar())
                 {
-                    if (ImGui.MenuItem("Save")) Save();
-                    if (ImGui.MenuItem("Save As")) SaveAs();
-                    if (ImGui.MenuItem("Close")) Close();
-                    ImGui.EndMenuBar();
-                }
-
-                if (ImGui.BeginTabBar("Tabs", ImGuiTabBarFlags.Reorderable))
-                {
-
-                    // Tilemap properties.
-                    if (ImGui.BeginTabItem("Properties"))
+                    if (ImGui.BeginMenu("Edit"))
                     {
-                        fixed (ushort* ptr = &TileMap.TileWidth) if (ImGui.InputScalar("Tile Width", ImGuiDataType.U16, (nint)ptr))
+                        if (ImGui.MenuItem("Undo"))
                         {
-                            if (TileMap.TileWidth == 0) TileMap.TileWidth = 1; // Divide by 0 error otherwise.
-                            ResetSize();
-                        }
-                        rlImGui.Tooltip("Width of each tile in pixels.");
-                        fixed (ushort* ptr = &TileMap.TileHeight) if (ImGui.InputScalar("Tile Height", ImGuiDataType.U16, (nint)ptr))
-                        {
-                            if (TileMap.TileHeight == 0) TileMap.TileHeight = 1; // Divide by 0 error otherwise.
-                            ResetSize();
-                        }
-                        rlImGui.Tooltip("Height of each tile in pixels.");
-                        fixed (ushort* ptr = &_resizeX) if (ImGui.InputScalar("Width", ImGuiDataType.U16, (nint)ptr))
-                            if (_resizeX == 0) _resizeX = 1;
-                        fixed (ushort* ptr = &_resizeY) if (ImGui.InputScalar("Height", ImGuiDataType.U16, (nint)ptr))
-                            if (_resizeY == 0) _resizeY = 1;
-                        if (ImGui.Button("Resize"))
-                        {
-                            TileMap.Resize(_resizeX, _resizeY);
-                            ResetSize();
-                        }
-                        rlImGui.Tooltip("Resize the tile map.");
-                        ImGui.EndTabItem();
-                    }
+                            // Interupting to ensure undo will not mess with the action.
+                            _currentAction.Interrupt();
 
-                    // Layer tab.
-                    if (ImGui.BeginTabItem("Layers"))
-                    {
-                        if (TileMap.GetCurrentLayerIndex() != -1) ImGui.InputText("Tileset", ref TileMap.GetCurrentLayer().TileSet, 5000);
-                        if (ImGui.BeginTable("Tilesets", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.Borders))
-                        {
-                            for (int i = 0; i < TileMap.GetLayerCount(); i++)
+                            if (_currentAction.CanGenerate())
                             {
-                                ImGui.TableNextRow();
-                                ImGui.TableNextColumn();
-                                bool curr = TileMap.GetCurrentLayerIndex() == i;
-                                if (ImGui.Selectable(TileMap.GetLayer(i).TileSet + (curr ? " *" : "") + "##" + i))
-                                {
-                                    TileMap.SetCurrentLayer(i);
-                                }
-                                ImGui.TableNextColumn();
-                                if (i > 0)
-                                {
-                                    if (ImGui.Button("Move Up##" + i)) TileMap.SwapLayers(i - 1, i);
-                                    ImGui.SameLine();
-                                }
-                                if (i < TileMap.GetLayerCount() - 1)
-                                {
-                                    if (ImGui.Button("Move Down##" + i)) TileMap.SwapLayers(i, i + 1);
-                                    ImGui.SameLine();
-                                }
-                                if (ImGui.Button("-##" + i))
-                                {
-                                    TileMap.DeleteLayer(i);
-                                    break;
-                                }
+                                _actionLog.AddAction(_currentAction.GenerateAction());
                             }
-                            ImGui.EndTable();
+                            _actionLog.Undo();
                         }
-                        if (ImGui.Button("Add Layer"))
+                        if (ImGui.MenuItem("Redo"))
                         {
-                            TileMap.AddLayer("TilesetHere");
+                            _currentAction.Interrupt();
+
+                            if (_currentAction.CanGenerate())
+                            {
+                                _actionLog.AddAction(_currentAction.GenerateAction());
+                            }
+                            _actionLog.Redo();
                         }
-                        ImGui.EndTabItem();
+                        ImGui.EndMenu();
+                        if (ImGui.MenuItem("Save")) Save();
+                        if (ImGui.MenuItem("Save As")) SaveAs();
+                        if (ImGui.MenuItem("Close")) Close();
+                        ImGui.EndMenuBar();
                     }
 
-                    // Canvas.
-                    if (ImGui.BeginTabItem("Canvas"))
+                    if (ImGui.BeginTabBar("Tabs", ImGuiTabBarFlags.Reorderable))
                     {
 
-                        var size = ImGui.GetContentRegionAvail();
+                        // Tilemap properties.
+                        if (ImGui.BeginTabItem("Properties"))
+                        {
+                            fixed (ushort* ptr = &TileMap.TileWidth) if (ImGui.InputScalar("Tile Width", ImGuiDataType.U16, (nint)ptr))
+                                {
+                                    if (TileMap.TileWidth == 0) TileMap.TileWidth = 1; // Divide by 0 error otherwise.
+                                    ResetSize();
+                                }
+                            rlImGui.Tooltip("Width of each tile in pixels.");
+                            fixed (ushort* ptr = &TileMap.TileHeight) if (ImGui.InputScalar("Tile Height", ImGuiDataType.U16, (nint)ptr))
+                                {
+                                    if (TileMap.TileHeight == 0) TileMap.TileHeight = 1; // Divide by 0 error otherwise.
+                                    ResetSize();
+                                }
+                            rlImGui.Tooltip("Height of each tile in pixels.");
+                            fixed (ushort* ptr = &_resizeX) if (ImGui.InputScalar("Width", ImGuiDataType.U16, (nint)ptr))
+                                    if (_resizeX == 0) _resizeX = 1;
+                            fixed (ushort* ptr = &_resizeY) if (ImGui.InputScalar("Height", ImGuiDataType.U16, (nint)ptr))
+                                    if (_resizeY == 0) _resizeY = 1;
+                            if (ImGui.Button("Resize"))
+                            {
+                                TileMap.Resize(_resizeX, _resizeY);
+                                ResetSize();
+                            }
+                            rlImGui.Tooltip("Resize the tile map.");
+                            ImGui.EndTabItem();
+                        }
 
-                        _currentWidth = size.X;
-                        _currentHeight = size.Y;
-                        _scaleX = _currentWidth / _trueWidth;
-                        _scaleY = _currentHeight / _trueHeight;
+                        // Layer tab.
+                        if (ImGui.BeginTabItem("Layers"))
+                        {
+                            if (TileMap.GetCurrentLayerIndex() != -1) ImGui.InputText("Tileset", ref TileMap.GetCurrentLayer().TileSet, 5000);
+                            if (ImGui.BeginTable("Tilesets", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.Borders))
+                            {
+                                for (int i = 0; i < TileMap.GetLayerCount(); i++)
+                                {
+                                    ImGui.TableNextRow();
+                                    ImGui.TableNextColumn();
+                                    bool curr = TileMap.GetCurrentLayerIndex() == i;
+                                    if (ImGui.Selectable(TileMap.GetLayer(i).TileSet + (curr ? " *" : "") + "##" + i))
+                                    {
+                                        TileMap.SetCurrentLayer(i);
+                                    }
+                                    ImGui.TableNextColumn();
+                                    if (i > 0)
+                                    {
+                                        if (ImGui.Button("Move Up##" + i)) TileMap.SwapLayers(i - 1, i);
+                                        ImGui.SameLine();
+                                    }
+                                    if (i < TileMap.GetLayerCount() - 1)
+                                    {
+                                        if (ImGui.Button("Move Down##" + i)) TileMap.SwapLayers(i, i + 1);
+                                        ImGui.SameLine();
+                                    }
+                                    if (ImGui.Button("-##" + i))
+                                    {
+                                        TileMap.DeleteLayer(i);
+                                        break;
+                                    }
+                                }
+                                ImGui.EndTable();
+                            }
+                            if (ImGui.Button("Add Layer"))
+                            {
+                                TileMap.AddLayer("TilesetHere");
+                            }
+                            ImGui.EndTabItem();
+                        }
 
-                        //Console.WriteLine(_currentWidth + " " + _currentWidth + " " + _scaleX + " " + _scaleY + " " + _trueWidth + " " + _trueHeight);
-
-            if (ImGui.BeginMainMenuBar())
-            {
-                if (ImGui.BeginMenu("Edit"))
-                {
-                    if (ImGui.MenuItem("Undo"))
-                    {
-                        // Interupting to ensure undo will not mess with the action.
-                        _currentAction.Interrupt();
-                        // Canvas click, tile placement.
                         var currPos = ImGui.GetCursorPos();
-                        if (ImGui.IsMouseDown(ImGuiMouseButton.Left) && ImGui.IsWindowFocused())
+
+                        // Canvas.
+                        if (ImGui.BeginTabItem("Canvas"))
                         {
 
-                        if (_currentAction.CanGenerate())
-                        {
-                            _actionLog.AddAction(_currentAction.GenerateAction());
-                        }
-                        _actionLog.Undo();
-                    }
-                    if (ImGui.MenuItem("Redo"))
-                    {
-                        _currentAction.Interrupt();
-                            Vector2 windowPos = ImGui.GetWindowPos();
-                            Vector2 mousePos = ImGui.GetMousePos();
+                            var size = ImGui.GetContentRegionAvail();
 
-                        if (_currentAction.CanGenerate())
-                        {
-                            _actionLog.AddAction(_currentAction.GenerateAction());
-                        }
-                        _actionLog.Redo();
-                    }
-                    ImGui.EndMenu();
-                }
-                ImGui.EndMainMenuBar();
-            }
+                            _currentWidth = size.X;
+                            _currentHeight = size.Y;
+                            _scaleX = _currentWidth / _trueWidth;
+                            _scaleY = _currentHeight / _trueHeight;
 
-            // Draw target.
-            DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
-                            int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
-                            int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
-                            if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight)
+                            //Console.WriteLine(_currentWidth + " " + _currentWidth + " " + _scaleX + " " + _scaleY + " " + _trueWidth + " " + _trueHeight);
+
+                            if (ImGui.IsWindowFocused())
                             {
 
-                                //Console.WriteLine(x + " : " + y);
+                                Vector2 windowPos = ImGui.GetWindowPos();
+                                Vector2 mousePos = ImGui.GetMousePos();
 
+                                int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
+                                int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
 
                                 x = (int)(x / (TileMap.TileWidth * _scaleX));
                                 y = (int)(y / (TileMap.TileHeight * _scaleY));
 
-
-                                try
+                                //Check if coordinates valid
+                                if (x >= 0 && x < TileMap.GetRows()
+                                    && y >= 0 && y < TileMap.GetCols())
                                 {
-                                    int t = _ts.GetTileSelected();
-                                    TileMap.GetCurrentLayer().SetTile((uint)x, (uint)y, t);
+                                    try
+                                    {
+                                        _currentAction.Update((uint)x, (uint)y, TileMap.GetCurrentLayer(), _ts.GetTileSelected());
+
+                                        if (_currentAction.CanGenerate())
+                                        {
+                                            _actionLog.AddAction(_currentAction.GenerateAction());
+                                        }
+                                    }
+                                    catch { }
                                 }
-                                catch { }
+
                             }
 
-            ImGui.End();
-        }
-
-        public override void Update()
-        {
-            // Determine where mouse is.
-            Vector2 windowPos = ImGui.GetWindowPos();
-            Vector2 mousePos = ImGui.GetMousePos();
-                        if (ImGui.IsMouseDown(ImGuiMouseButton.Right) && ImGui.IsWindowFocused())
-                        {
-                            Vector2 windowPos = ImGui.GetWindowPos();
-                            Vector2 mousePos = ImGui.GetMousePos();
-
-                            int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
-                            int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
-                            if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight)
-                            {
-
-                                //Console.WriteLine(x + " : " + y);
-            int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
-            int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
-
-            x = (int)(x / (_unitSize * _scaleX));
-            y = (int)(y / (_unitSize * _scaleY));
-
-            //Check if coordinates valid
-            if(x >= 0 && x < _tMap.GetRows()
-                && y >= 0 && y < _tMap.GetCols())
-            {
-                _currentAction.Update((uint)x, (uint)y, _tMap.GetCurrentLayer(), _ts.GetTileSelected());
-
-                if(_currentAction.CanGenerate())
-                {
-                    _actionLog.AddAction(_currentAction.GenerateAction());
-                }
-            }
-                                x = (int)(x / (TileMap.TileWidth * _scaleX));
-                                y = (int)(y / (TileMap.TileHeight * _scaleY));
-
-
-                                try
-                                {
-                                    TileMap.GetCurrentLayer().SetTile((uint)x, (uint)y, -1);
-                                }
-                                catch { }
-                            }
                         }
+
+
 
                         // Draw target.
                         ImGui.InvisibleButton("NoDrag", new Vector2(_currentWidth, _currentHeight));
@@ -289,6 +245,11 @@ namespace TileMapper.UI
                 ImGui.End();
             }
             DoSaveAs();
+        }
+
+        public override void Update()
+        {
+            
         }
 
         // Draw according to trueSize not current.

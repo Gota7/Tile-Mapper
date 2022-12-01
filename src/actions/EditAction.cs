@@ -1,6 +1,6 @@
 ﻿
 
-namespace Tile_Mapper
+namespace TileMapper
 {
     // Interface for the doing/undoing of an action.
     public interface EditAction

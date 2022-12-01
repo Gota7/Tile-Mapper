@@ -2,7 +2,7 @@
 
 using TileMapper;
 
-namespace Tile_Mapper
+namespace TileMapper
 {
     // Class to contain the edit for placing multiple tiles.
     public class MultiplaceEditAction : EditAction

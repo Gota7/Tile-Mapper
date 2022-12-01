@@ -1,6 +1,6 @@
 ﻿
 
-namespace Tile_Mapper
+namespace TileMapper
 {
     // Class to list the actions that are undoable.
     public class UndoLog

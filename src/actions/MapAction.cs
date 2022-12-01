@@ -1,8 +1,6 @@
 ﻿
 
-using TileMapper;
-
-namespace Tile_Mapper
+namespace TileMapper
 {
     // Interface to genericise generating an edit object for an action.
     public interface MapAction

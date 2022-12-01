@@ -3,7 +3,7 @@
 using ImGuiNET;
 using TileMapper;
 
-namespace Tile_Mapper
+namespace TileMapper
 {
     // Action to place a single tile at a location.
     public class PlaceAction : MapAction

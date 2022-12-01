@@ -2,7 +2,7 @@
 
 using TileMapper;
 
-namespace Tile_Mapper
+namespace TileMapper
 {
     // Class to contain the edit for placing a single tile.
     public class PlaceEditAction : EditAction
