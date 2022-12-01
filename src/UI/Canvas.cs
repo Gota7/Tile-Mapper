@@ -27,8 +27,7 @@ namespace TileMapper.UI
 
         private bool _sizeSet = false;
 
-        // Numbers found from manuelly testing cursor positions, No programatic way known :(
-        private static int _windowPadding = 8, _windowPaddingTop = 71;
+        private static int _windowPadding, _windowPaddingTop;
         private string _windowName = "";
         private static int _newTileMapNumber = 1;
 
@@ -45,7 +44,7 @@ namespace TileMapper.UI
             this.TileMap = tMap;
             this._ts = ts;
             ResetSize();
-
+            GetWindowPadding();
             _currentAction = new PlaceAction();
         }
 
@@ -64,13 +63,11 @@ namespace TileMapper.UI
         public override unsafe void DrawUI()
         {
 
-            //GetWindowPadding();
-
             // Canvas is 600x600, other window elements are 8x27x8x8 found from GetWindowContentRegionMin.
 
             if (!_sizeSet)
             {
-                ImGui.SetNextWindowSize(new Vector2(_trueWidth + 2 * _windowPadding, _trueHeight + _windowPaddingTop + _windowPadding));
+                ImGui.SetNextWindowSize(new Vector2(_trueWidth + 2 * _windowPadding, _trueHeight + _windowPaddingTop * 2));
                 _sizeSet = true;
             }
 
@@ -223,8 +220,8 @@ namespace TileMapper.UI
                                 Vector2 windowPos = ImGui.GetWindowPos();
                                 Vector2 mousePos = ImGui.GetMousePos();
 
-                                int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
-                                int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
+                                int x = (int)(mousePos.X - windowPos.X - currPos.X);
+                                int y = (int)(mousePos.Y - windowPos.Y - currPos.Y);
 
                                 x = (int)(x / (TileMap.TileWidth * _scaleX));
                                 y = (int)(y / (TileMap.TileHeight * _scaleY));
@@ -247,15 +244,14 @@ namespace TileMapper.UI
 
                             }
 
+                            // Draw target.
+                            ImGui.InvisibleButton("NoDrag", new Vector2(_currentWidth, _currentHeight));
+                            ImGui.SetCursorPos(currPos); // Prevent dragging with invisible button and put cursor back in place.
+                            DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
+                            ImGui.EndTabItem();
+
                         }
 
-
-
-                        // Draw target.
-                        ImGui.InvisibleButton("NoDrag", new Vector2(_currentWidth, _currentHeight));
-                        ImGui.SetCursorPos(currPos); // Prevent dragging with invisible button and put cursor back in place.
-                        DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
-                        ImGui.EndTabItem();
                     }
                     ImGui.EndTabBar();
                 }
@@ -321,7 +317,7 @@ namespace TileMapper.UI
 
         private void GetWindowPadding()
         {
-            var v = ImGui.GetWindowContentRegionMin();
+            var v = ImGui.GetStyle().WindowPadding + ImGui.GetStyle().FramePadding;
             _windowPadding = (int)v.X;
             _windowPaddingTop = (int)v.Y;
         }
