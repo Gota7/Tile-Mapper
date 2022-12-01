@@ -27,7 +27,8 @@ namespace TileMapper.UI
 
         private bool _sizeSet = false;
 
-        private int _windowPadding, _windowPaddingTop;
+        // Numbers found from manuelly testing cursor positions, No programatic way known :(
+        private static int _windowPadding = 8, _windowPaddingTop = 71;
         private string _windowName = "";
         private static int _newTileMapNumber = 1;
 
@@ -63,7 +64,7 @@ namespace TileMapper.UI
         public override unsafe void DrawUI()
         {
 
-            GetWindowPadding();
+            //GetWindowPadding();
 
             // Canvas is 600x600, other window elements are 8x27x8x8 found from GetWindowContentRegionMin.
 

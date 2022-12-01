@@ -91,7 +91,6 @@ namespace TileMapper.UI
                 int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop + (int)ImGui.GetScrollY();
                 if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight + ImGui.GetScrollY())
                 {
-                    Console.WriteLine(ImGui.GetWindowContentRegionMin());
                     x = (int)(x / (UnitSize + TileGap));
                     y = (int)(y / (UnitSize + RowGap));
 
