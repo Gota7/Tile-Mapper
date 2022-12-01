@@ -36,7 +36,7 @@ namespace TileMapper.UI
 
         private int _windowPadding, _windowPaddingTop;
 
-        private int _prevTsWidth, _prevTsHeight;
+        private int _prevTsWidth, _prevTsHeight, _prevTsXspace, _prevTsYspace, _prevTsXpadding, _prevTsYpadding ;
 
         public TileSelector() : base(0, 0)
         {
@@ -66,7 +66,7 @@ namespace TileMapper.UI
             if (_set == null) return;
 
             GetWindowPadding();
-            CheckSizeChange();
+            CheckTSChange();
 
             if (!_sizeSet)
             {
@@ -178,6 +178,10 @@ namespace TileMapper.UI
 
             _prevTsWidth = _set.TileWidth;
             _prevTsHeight = _set.TileHeight;
+            _prevTsXspace = _set.TileInitialSpacingX;
+            _prevTsYspace = _set.TileInitialSpacingY;
+            _prevTsXpadding = _set.TilePaddingX;
+            _prevTsYpadding = _set.TilePaddingY;
 
             // Uncomment these lines if you want selected Tile to reset when changing TileSets.
             // _TileSelcted.TileSet = "";
@@ -191,9 +195,9 @@ namespace TileMapper.UI
             _windowPaddingTop = (int)v.Y;
         }
 
-        private void CheckSizeChange() {
+        private void CheckTSChange() {
 
-            if (_set.TileWidth != _prevTsWidth || _set.TileHeight != _prevTsHeight) {
+            if (_set.TileWidth != _prevTsWidth || _set.TileHeight != _prevTsHeight || _set.TileInitialSpacingX != _prevTsXspace || _set.TileInitialSpacingY != _prevTsYspace || _set.TilePaddingX != _prevTsXpadding || _set.TilePaddingY != _prevTsYpadding) {
                 ChangeTileSet(_set);
             }
         }
