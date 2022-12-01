@@ -155,17 +155,17 @@ namespace TileMapper
         public void SwapLayers(int firstIndex, int secondIndex)
         {
             // Ensuring the two layers are valid.
-            if(firstIndex < this.GetLayerCount() && secondIndex < this.GetLayerCount() && firstIndex >= 0 && secondIndex >= 0)
+            if (firstIndex < this.GetLayerCount() && secondIndex < this.GetLayerCount() && firstIndex >= 0 && secondIndex >= 0)
             {
                 TileLayer temp = this._layers[firstIndex];
                 this._layers[firstIndex] = this._layers[secondIndex];
                 this._layers[secondIndex] = temp;
 
-                if(this._currentLayer == firstIndex)
+                if (this._currentLayer == firstIndex)
                 {
                     this._currentLayer = secondIndex;
                 }
-                else if(this._currentLayer == secondIndex)
+                else if (this._currentLayer == secondIndex)
                 {
                     this._currentLayer = firstIndex;
                 }
