@@ -61,16 +61,6 @@ namespace TileMapper.UI
                     if (ImGui.MenuItem("Open")) OpenFiles();
                     ImGui.EndMenu();
                 }
-                if (ImGui.BeginMenu("Edit"))
-                {
-                    if (ImGui.MenuItem("Undo"))
-                    {
-                    }
-                    if (ImGui.MenuItem("Redo"))
-                    {
-                    }
-                    ImGui.EndMenu();
-                }
                 if (ImGui.BeginMenu("Tool"))
                 {
                     ImGui.EndMenu();
