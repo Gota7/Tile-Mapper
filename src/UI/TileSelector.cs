@@ -36,6 +36,8 @@ namespace TileMapper.UI
 
         private int _windowPadding, _windowPaddingTop;
 
+        private int _prevTsWidth, _prevTsHeight;
+
         public TileSelector() : base(0, 0)
         {
 
@@ -64,6 +66,7 @@ namespace TileMapper.UI
             if (_set == null) return;
 
             GetWindowPadding();
+            CheckSizeChange();
 
             if (!_sizeSet)
             {
@@ -173,6 +176,9 @@ namespace TileMapper.UI
                 }
             }
 
+            _prevTsWidth = _set.TileWidth;
+            _prevTsHeight = _set.TileHeight;
+
             // Uncomment these lines if you want selected Tile to reset when changing TileSets.
             // _TileSelcted.TileSet = "";
             // _TileSelcted.Id = -1;
@@ -183,6 +189,13 @@ namespace TileMapper.UI
             var v = ImGui.GetWindowContentRegionMin();
             _windowPadding = (int)v.X;
             _windowPaddingTop = (int)v.Y;
+        }
+
+        private void CheckSizeChange() {
+
+            if (_set.TileWidth != _prevTsWidth || _set.TileHeight != _prevTsHeight) {
+                ChangeTileSet(_set);
+            }
         }
 
     }
