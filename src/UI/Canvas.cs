@@ -116,13 +116,39 @@ namespace TileMapper.UI
                     if (ImGui.BeginTabItem("Layers"))
                     {
                         if (TileMap.GetCurrentLayerIndex() != -1) ImGui.InputText("Tileset", ref TileMap.GetCurrentLayer().TileSet, 5000);
-                        for (int i = 0; i < TileMap.GetLayerCount(); i++)
+                        if (ImGui.BeginTable("Tilesets", 2, ImGuiTableFlags.Resizable | ImGuiTableFlags.NoSavedSettings | ImGuiTableFlags.Borders))
                         {
-                            bool curr = TileMap.GetCurrentLayerIndex() == i;
-                            if (ImGui.Selectable(TileMap.GetLayer(i).TileSet + (curr ? " *" : "") + "##" + i))
+                            for (int i = 0; i < TileMap.GetLayerCount(); i++)
                             {
-                                TileMap.SetCurrentLayer(i);
+                                ImGui.TableNextRow();
+                                ImGui.TableNextColumn();
+                                bool curr = TileMap.GetCurrentLayerIndex() == i;
+                                if (ImGui.Selectable(TileMap.GetLayer(i).TileSet + (curr ? " *" : "") + "##" + i))
+                                {
+                                    TileMap.SetCurrentLayer(i);
+                                }
+                                ImGui.TableNextColumn();
+                                if (i > 0)
+                                {
+                                    if (ImGui.Button("Move Up##" + i)) TileMap.SwapLayers(i - 1, i);
+                                    ImGui.SameLine();
+                                }
+                                if (i < TileMap.GetLayerCount() - 1)
+                                {
+                                    if (ImGui.Button("Move Down##" + i)) TileMap.SwapLayers(i, i + 1);
+                                    ImGui.SameLine();
+                                }
+                                if (ImGui.Button("-##" + i))
+                                {
+                                    TileMap.DeleteLayer(i);
+                                    break;
+                                }
                             }
+                            ImGui.EndTable();
+                        }
+                        if (ImGui.Button("Add Layer"))
+                        {
+                            TileMap.AddLayer("TilesetHere");
                         }
                         ImGui.EndTabItem();
                     }
