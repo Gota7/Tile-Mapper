@@ -52,6 +52,11 @@ namespace TileMapper.UI
                     }
                     if (ImGui.MenuItem("New Tilemap"))
                     {
+                        _tileMaps.Add(new Canvas(_tsSelector, new TileMap(0x10, 0x10, 0x10, 0x10)));
+                        foreach (var ts in _selector.AllSets())
+                        {
+                            _tileMaps.Last().TileMap.AddTileSet(ts);
+                        }
                     }
                     if (ImGui.MenuItem("Open")) OpenFiles();
                     ImGui.EndMenu();
