@@ -67,7 +67,7 @@ namespace TileMapper.UI
 
             if (!_sizeSet)
             {
-                ImGui.SetNextWindowSize(new Vector2(_trueWidth + 2*_windowPadding, WindowHeight));
+                ImGui.SetNextWindowSize(new Vector2(_trueWidth + 3*_windowPadding, WindowHeight));
                 _sizeSet = true;
             }
 
