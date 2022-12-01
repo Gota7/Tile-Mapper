@@ -15,6 +15,8 @@ namespace TileMapper.UI
 
         public static int TileGap = 20, RowGap = 10;
 
+        public static int WindowHeight = 600;
+
         private int _trueWidth, _trueHeight;
         private float _currentWidth, _currentHeight;
 
@@ -65,11 +67,11 @@ namespace TileMapper.UI
 
             if (!_sizeSet)
             {
-                ImGui.SetNextWindowSize(new Vector2(_trueWidth + 2*_windowPadding, _trueHeight + _windowPaddingTop + _windowPadding));
+                ImGui.SetNextWindowSize(new Vector2(_trueWidth + 3*_windowPadding, WindowHeight));
                 _sizeSet = true;
             }
 
-            ImGui.Begin("Tile Selector");
+            ImGui.Begin("Tile Selector", ImGuiWindowFlags.AlwaysVerticalScrollbar);
 
             var size = ImGui.GetContentRegionAvail();
 
@@ -86,11 +88,12 @@ namespace TileMapper.UI
                 Vector2 windowPos = ImGui.GetWindowPos();
                 Vector2 mousePos = ImGui.GetMousePos();
                 int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
-                int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop;
-                if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight)
+                int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop + (int)ImGui.GetScrollY();
+                if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight + ImGui.GetScrollY())
                 {
-                    x = (int)(x / ((UnitSize + TileGap) * _scaleX));
-                    y = (int)(y / ((UnitSize + RowGap) * _scaleY));
+                    Console.WriteLine(ImGui.GetWindowContentRegionMin());
+                    x = (int)(x / (UnitSize + TileGap));
+                    y = (int)(y / (UnitSize + RowGap));
 
                     if (x >= 0 && y >= 0)
                     {
@@ -104,7 +107,8 @@ namespace TileMapper.UI
 
             ImGui.InvisibleButton("NoDrag", new Vector2(_currentWidth, _currentHeight)); // Prevent dragging of window.
             ImGui.SetCursorPos(currPos);
-            DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
+            //DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
+            DrawRenderTarget((int)_trueWidth, (int)_trueHeight);
 
             ImGui.End();
         }
