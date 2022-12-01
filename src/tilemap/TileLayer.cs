@@ -26,9 +26,10 @@ namespace TileMapper
         }
 
         // Constructor for loaded layer.
-        public TileLayer(int[,] tiles)
+        public TileLayer(string tileSet, int[,] tiles)
         {
-            this._tilePlacements = tiles;
+            TileSet = tileSet;
+            _tilePlacements = tiles;
         }
 
         // Method to retrieve the number of columns in layer.
@@ -81,5 +82,18 @@ namespace TileMapper
 
             this._tilePlacements = newTiles;
         }
+
+        public void Write(BinaryWriter bw)
+        {
+            bw.Write(TileSet);
+            for (int i = 0; i < _tilePlacements.GetLength(0); i++)
+            {
+                for (int j = 0; j < _tilePlacements.GetLength(1); j++)
+                {
+                    bw.Write(_tilePlacements[i, j]);
+                }
+            }
+        }
+
     }
 }

@@ -24,10 +24,17 @@ namespace TileMapper.UI
         private TileSelector _tsSelector = new TileSelector();
         private string _lastTileSet = "";
 
+        // Each canvas has their own tilemap.
+        private List<Canvas> _tileMaps = new List<Canvas>();
+
         public void DoDraw()
         {
             if (_tsEditor != null) _tsEditor.DoDraw();
             _tsSelector.DoDraw();
+            foreach (var canvas in _tileMaps)
+            {
+                canvas.DoDraw();
+            }
         }
 
         public override void DrawUI()
@@ -45,6 +52,11 @@ namespace TileMapper.UI
                     }
                     if (ImGui.MenuItem("New Tilemap"))
                     {
+                        _tileMaps.Add(new Canvas(_tsSelector, new TileMap(0x10, 0x10, 0x10, 0x10)));
+                        foreach (var ts in _selector.AllSets())
+                        {
+                            _tileMaps.Last().TileMap.AddTileSet(ts);
+                        }
                     }
                     if (ImGui.MenuItem("Open")) OpenFiles();
                     ImGui.EndMenu();
@@ -86,6 +98,10 @@ namespace TileMapper.UI
             if (_tsEditor != null && _tsEditor.CurrTileSet != null) _tsEditor.DrawUI();
             if (_selectorShown) _selector.DrawUI();
             _tsSelector.DrawUI();
+            foreach (var canvas in _tileMaps)
+            {
+                canvas.DrawUI();
+            }
 
         }
 
@@ -102,6 +118,11 @@ namespace TileMapper.UI
             _lastTileSet = _selector.CurrTileset;
             _tsEditor.Update();
             _tsSelector.Update();
+            for (int i = _tileMaps.Count - 1; i >= 0; i--)
+            {
+                _tileMaps[i].Update();
+                if (!_tileMaps[i].Open) _tileMaps.RemoveAt(i);
+            }
 
         }
 
@@ -145,13 +166,22 @@ namespace TileMapper.UI
         // Open a tileset.
         private void OpenTileSet(string tms)
         {
-            _selector.AddTileset(tms, new TileSet(tms));
+            var ts = new TileSet(tms);
+            _selector.AddTileset(tms, ts);
+            foreach (var canvas in _tileMaps)
+            {
+                canvas.TileMap.AddTileSet(ts);
+            }
         }
 
         // Open a tilemap.
         private void OpenTileMap(string tmm)
         {
-            // TODO!!!
+            _tileMaps.Add(new Canvas(_tsSelector, new TileMap(tmm)));
+            foreach (var ts in _selector.AllSets())
+            {
+                _tileMaps.Last().TileMap.AddTileSet(ts);
+            }
         }
 
         // Draw the menu for the tileset editor.
@@ -164,6 +194,10 @@ namespace TileMapper.UI
                 }
                 if (ImGui.MenuItem("Close"))
                 {
+                    foreach (var canvas in core._tileMaps)
+                    {
+                        canvas.TileMap.RemoveTileSet(core._selector.CurrTilesetData);
+                    }
                     core._selector.RemoveTileset(core._selector.CurrTileset);
                 }
                 if (ImGui.MenuItem("Delete"))

@@ -1,38 +1,34 @@
-﻿namespace TileMapper
+﻿using PbvCompressor;
+
+namespace TileMapper
 {
     // Class to store and manipulate information related to current tile map.
     public class TileMap
     {
         // Variables.
 
-        private string _filePath;
+        private string _filePath = "";
+        public string Path => _filePath;
 
         private ushort _rows;
         private ushort _columns;
 
-        private ushort _tileWidth;
-        private ushort _tileHeight;
+        public ushort TileWidth;
+        public ushort TileHeight;
 
-        private List<TileLayer> _layers;
-        private int _currentLayer;
+        private List<TileLayer> _layers = new List<TileLayer>();
+        private int _currentLayer = -1;
 
         // Find TileSets from name, used by canvas to draw correct tile.
-        private Dictionary<String, TileSet> _nameToSet;
+        private Dictionary<String, TileSet> _nameToSet = new Dictionary<string, TileSet>();
 
         // Constructor for new map.
         public TileMap(ushort rows, ushort columns, ushort tileWidth, ushort tileHeight)
         {
-            this._filePath = "";
-            this._currentLayer = -1;
-
             this._rows = rows;
             this._columns = columns;
-            this._tileWidth = tileWidth;
-            this._tileHeight = tileHeight;
-
-            this._layers = new List<TileLayer>();
-            _nameToSet = new Dictionary<string, TileSet>();
-
+            this.TileWidth = tileWidth;
+            this.TileHeight = tileHeight;
         }
 
         // Constructor that loads from file.
@@ -40,7 +36,41 @@
         {
             this._filePath = filePath;
 
-            throw new NotImplementedException();
+            // Read data and uncompress.
+            using (FileStream fileIn = new FileStream(filePath, FileMode.Open))
+            {
+                if (fileIn.ReadByte() != 'T' || fileIn.ReadByte() != 'M' || fileIn.ReadByte() != 'M')
+                    throw new Exception("Can not load tileset " + filePath + ". Not a Tile-Mapper Tilemap.");
+                fileIn.ReadByte(); // Skip version.
+                using (MemoryStream uncompressed = new MemoryStream())
+                {
+                    PbvCompressorLZW compressor = new PbvCompressorLZW();
+                    compressor.Decompress(fileIn, uncompressed);
+                    uncompressed.Seek(0, SeekOrigin.Begin); // Decompress file and start at beginning of data.
+                    using (BinaryReader r = new BinaryReader(uncompressed))
+                    {
+                        _rows = r.ReadUInt16();
+                        _columns = r.ReadUInt16();
+                        TileWidth = r.ReadUInt16();
+                        TileHeight = r.ReadUInt16();
+                        int numLayers = r.ReadInt32();
+                        _layers = new List<TileLayer>();
+                        for (int i = 0; i < numLayers; i++)
+                        {
+                            string tileset = r.ReadString();
+                            int[,] tilePlacements = new int[_rows, _columns];
+                            for (int x = 0; x < _rows; x++)
+                            {
+                                for (int y = 0; y < _columns; y++)
+                                {
+                                    tilePlacements[x, y] = r.ReadInt32();
+                                }
+                            }
+                            _layers.Add(new TileLayer(tileset, tilePlacements));
+                        }
+                    }
+                }
+            }
         }
 
         // Method to retrieve the number of columns in map.
@@ -125,17 +155,17 @@
         public void SwapLayers(int firstIndex, int secondIndex)
         {
             // Ensuring the two layers are valid.
-            if(firstIndex < this.GetLayerCount() && secondIndex < this.GetLayerCount() && firstIndex >= 0 && secondIndex >= 0)
+            if (firstIndex < this.GetLayerCount() && secondIndex < this.GetLayerCount() && firstIndex >= 0 && secondIndex >= 0)
             {
                 TileLayer temp = this._layers[firstIndex];
                 this._layers[firstIndex] = this._layers[secondIndex];
                 this._layers[secondIndex] = temp;
 
-                if(this._currentLayer == firstIndex)
+                if (this._currentLayer == firstIndex)
                 {
                     this._currentLayer = secondIndex;
                 }
-                else if(this._currentLayer == secondIndex)
+                else if (this._currentLayer == secondIndex)
                 {
                     this._currentLayer = firstIndex;
                 }
@@ -165,40 +195,51 @@
             }
         }
 
-        // Method to resize tile pixels.
-        public void SetUnitSize(ushort newWidth, ushort newHeight)
-        {
-            this._tileWidth = newWidth;
-            this._tileHeight = newHeight;
-        }
-
-        public ushort GetUnitWidth()
-        {
-            return _tileWidth;
-        }
-
-        public ushort GetUnitHeight()
-        {
-            return _tileHeight;
-        }
-
         // Method to save current TileMap to a new file path.
         public void Save(string filePath)
         {
             this._filePath = filePath;
-
             this.Save();
         }
 
         // Method to save to stored file path.
         public void Save()
         {
-            throw new NotImplementedException();
+            using (FileStream fileOut = new FileStream(_filePath, FileMode.Create))
+            {
+                using (MemoryStream uncompressed = new MemoryStream())
+                {
+                    using (BinaryWriter w = new BinaryWriter(uncompressed))
+                    {
+                        w.Write(_rows);
+                        w.Write(_columns);
+                        w.Write(TileWidth);
+                        w.Write(TileHeight);
+                        w.Write(_layers.Count);
+                        foreach (var layer in _layers)
+                        {
+                            layer.Write(w);
+                        }
+                        fileOut.WriteByte((byte)'T');
+                        fileOut.WriteByte((byte)'M');
+                        fileOut.WriteByte((byte)'M');
+                        fileOut.WriteByte(0); // Write out header and version.
+                        PbvCompressorLZW compressor = new PbvCompressorLZW();
+                        uncompressed.Seek(0, SeekOrigin.Begin);
+                        compressor.Compress(uncompressed, fileOut); // Seek to beginning of uncompressed data stream and write out compressed data.
+                    }
+                }
+            }
         }
 
         public void AddTileSet(TileSet ts)
         {
-            _nameToSet.Add(ts.Name, ts);
+            if (!_nameToSet.ContainsKey(ts.Name)) _nameToSet.Add(ts.Name, ts);
+        }
+
+        public void RemoveTileSet(TileSet ts)
+        {
+            if (_nameToSet.ContainsKey(ts.Name)) _nameToSet.Remove(ts.Name);
         }
 
         // Given a name, a TileSet with that name will be returned.
