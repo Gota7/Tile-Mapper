@@ -1,7 +1,6 @@
 ﻿
 
 using ImGuiNET;
-using TileMapper;
 
 namespace TileMapper
 {
@@ -20,8 +19,7 @@ namespace TileMapper
         // Constructor.
         public PlaceAction()
         {
-            _startedPlacing = false;
-            _finishedPlacing = false;
+            Reset();
 
             _isRemoving = false;
 
@@ -40,11 +38,16 @@ namespace TileMapper
             EditAction groupedPlacements = new MultiplaceEditAction(_singlePlacements);
 
             _singlePlacements.Clear();
-
-            _startedPlacing = false;
-            _finishedPlacing = false;
+            Reset();
 
             return groupedPlacements;
+        }
+
+        // Resets the state of the flags
+        private void Reset()
+        {
+            _startedPlacing = false;
+            _finishedPlacing = false;
         }
 
         // Finishes group of placements.
@@ -87,6 +90,10 @@ namespace TileMapper
             else if (_singlePlacements.Count > 0)
             {
                 _finishedPlacing = true;
+            }
+            else
+            {
+                Reset();
             }
         }
     }

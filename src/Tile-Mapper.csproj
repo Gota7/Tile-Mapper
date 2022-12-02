@@ -10,7 +10,4 @@
     <PackageReference Include="Raylib-cs" Version="4.2.0.1" />
     <PackageReference Include="ImGui.NET" Version="1.87.3" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="actions\fill action\" />
-  </ItemGroup>
 </Project>

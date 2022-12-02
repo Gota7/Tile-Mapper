@@ -121,9 +121,9 @@ namespace TileMapper.UI
                     if (ImGui.BeginMenu("Actions"))
                     {
                         if (ImGui.MenuItem("Place")) _currentAction = new PlaceAction();
-                        if (ImGui.MenuItem("Select")) _currentAction = new PlaceAction();
-                        if (ImGui.MenuItem("Fill")) _currentAction = new PlaceAction();
-                        if (ImGui.MenuItem("Pipet")) _currentAction = new PlaceAction();
+                        if (ImGui.MenuItem("Select")) _currentAction = new SelectAction();
+                        if (ImGui.MenuItem("Fill")) _currentAction = new FillAction();
+                        if (ImGui.MenuItem("Pipet")) _currentAction = new PipetAction();
 
                         ImGui.EndMenu();
                     }
