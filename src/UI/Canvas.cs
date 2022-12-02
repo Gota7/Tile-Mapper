@@ -3,6 +3,7 @@ using Raylib_cs;
 using ImGuiNET;
 using System.Numerics;
 using rlImGui_cs;
+using System.Reflection.Emit;
 
 namespace TileMapper.UI
 {
@@ -325,6 +326,29 @@ namespace TileMapper.UI
                 {
                     // Draw tile borders.
                     Raylib.DrawRectangleLinesEx(new Rectangle(i * TileMap.TileWidth, j * TileMap.TileHeight, TileMap.TileWidth, TileMap.TileHeight), 0.5f, Color.BLACK);
+                }
+            }
+
+            // Draw border of selection.
+            if (_currentAction is SelectAction)
+            {
+                int[,] bounds = ((SelectAction)_currentAction).GetBounds();
+
+                if (bounds != null)
+                {
+                    int minX = Math.Max(0, bounds[0, 0]);
+                    int minY = Math.Max(0, bounds[1, 0]);
+
+                    int maxX = Math.Min(TileMap.GetRows() - 1, bounds[0, 1]);
+                    int maxY = Math.Min(TileMap.GetCols() - 1, bounds[1, 1]);
+
+                    float x = minX * TileMap.TileWidth;
+                    float y = minY * TileMap.TileHeight;
+
+                    float width = (1 + maxX - minX) * TileMap.TileWidth;
+                    float height = (1 + maxY - minY) * TileMap.TileHeight;
+
+                    Raylib.DrawRectangleLinesEx(new Rectangle(x, y, width, height), 1f, Color.RED);
                 }
             }
         }

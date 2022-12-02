@@ -135,8 +135,8 @@ namespace TileMapTests
             TileMap lm = new TileMap("Dummy.tmm");
             Assert.Equal(10, lm.GetRows());
             Assert.Equal(12, lm.GetCols());
-            Assert.Equal(11, lm.GetUnitWidth());
-            Assert.Equal(13, lm.GetUnitHeight());
+            Assert.Equal(11, lm.TileWidth);
+            Assert.Equal(13, lm.TileHeight);
             Assert.Equal("Layer1", lm.GetLayer(0).TileSet);
             Assert.Equal("Layer2", lm.GetLayer(1).TileSet);
             Assert.Equal(7, lm.GetLayer(0).GetTile(3, 3));
