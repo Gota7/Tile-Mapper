@@ -275,11 +275,6 @@ namespace TileMapper.UI
             DoSaveAs();
         }
 
-        public override void Update()
-        {
-            
-        }
-
         // Draw according to trueSize not current.
         protected override void Draw()
         {
@@ -308,7 +303,8 @@ namespace TileMapper.UI
                         {
                             //Raylib.DrawRectangle(i*_unitSize,j*_unitSize,_unitSize,_unitSize,Color.DARKGREEN);
                             float scaleX = (float)TileMap.TileWidth / set.TileWidth;
-                            set.Draw(i * TileMap.TileWidth, j * TileMap.TileHeight, (uint)t, scaleX);
+                            float scaleY = (float)TileMap.TileHeight / set.TileHeight;
+                            set.Draw(i * TileMap.TileWidth, j * TileMap.TileHeight, (uint)t, scaleX, scaleY);
                         }
                     }
                 }

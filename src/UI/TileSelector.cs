@@ -90,8 +90,8 @@ namespace TileMapper.UI
 
                 Vector2 windowPos = ImGui.GetWindowPos();
                 Vector2 mousePos = ImGui.GetMousePos();
-                int x = (int)mousePos.X - (int)windowPos.X - _windowPadding;
-                int y = (int)mousePos.Y - (int)windowPos.Y - _windowPaddingTop + (int)ImGui.GetScrollY();
+                int x = (int)(mousePos.X - windowPos.X - currPos.X);
+                int y = (int)(mousePos.Y - windowPos.Y - currPos.Y + ImGui.GetScrollY());
                 if (x >= 0 && y >= 0 && x < _currentWidth && y < _currentHeight + ImGui.GetScrollY())
                 {
                     x = (int)(x / (UnitSize + TileGap));
@@ -107,7 +107,7 @@ namespace TileMapper.UI
 
             }
 
-            ImGui.InvisibleButton("NoDrag", new Vector2(_currentWidth, _currentHeight)); // Prevent dragging of window.
+            ImGui.InvisibleButton("NoDrag", new Vector2(_trueWidth, _trueHeight)); // Prevent dragging of window.
             ImGui.SetCursorPos(currPos);
             //DrawRenderTarget((int)_currentWidth, (int)_currentHeight);
             DrawRenderTarget((int)_trueWidth, (int)_trueHeight);
@@ -124,13 +124,14 @@ namespace TileMapper.UI
 
             Raylib.ClearBackground(Color.DARKBLUE);
 
-            float scale = (float)UnitSize / _set.TileWidth;
+            float scaleX = (float)UnitSize / _set.TileWidth;
+            float scaleY = (float)UnitSize / _set.TileHeight;
             int col = 0, row = 0;
 
             for (int i = 0; i < _tileList.Length; i++)
             {
 
-                _set.Draw(row * UnitSize + row * TileGap, col * UnitSize + RowGap * col, (uint)_tileList[i], scale);
+                _set.Draw(row * UnitSize + row * TileGap, col * UnitSize + RowGap * col, (uint)_tileList[i], scaleX, scaleY);
 
                 // Draw border around selected tile.
                 if (_tileSelected == _tileList[i])
