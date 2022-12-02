@@ -164,13 +164,13 @@ namespace TileMapper
                     }
                 }
             }
-            else if (_state == SelectionState.Dragging)
-            {
-                _state = SelectionState.Finished;
-            }
             else if (_state == SelectionState.Selecting)
             {
                 _state = SelectionState.Idle;
+            }
+            else if (ImGui.IsMouseDown(ImGuiMouseButton.Right) && (_state == SelectionState.Dragging || _state == SelectionState.Pasted))
+            {
+                _state = SelectionState.Finished;
             }
             else if (ImGui.IsMouseDown(ImGuiMouseButton.Right) && _state == SelectionState.Idle)
             {
