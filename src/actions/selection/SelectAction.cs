@@ -1,6 +1,7 @@
 ﻿
 
 using ImGuiNET;
+using System.Reflection.Emit;
 
 namespace TileMapper
 {
@@ -113,17 +114,7 @@ namespace TileMapper
                             
                             _selectedTiles = GetSelection(layer);
 
-                            int[,] removalMap = new int[_selectedTiles.GetLength(0),_selectedTiles.GetLength(1)];
-
-                            for (int i = 0; i < removalMap.GetLength(0); i++)
-                            {
-                                for (int j = 0; j < removalMap.GetLength(1); j++)
-                                {
-                                    removalMap[i, j] = -1;
-                                }
-                            }
-
-                            _removeInitialAction = SetSelection(layer, removalMap, _selection[0, 0], _selection[1, 0]);
+                            _removeInitialAction = FillSelection(layer, -1);
                             _placeDragAction = SetSelection(layer, _selectedTiles, _selection[0, 0], _selection[1, 0]);
                         }
                     }
@@ -179,6 +170,12 @@ namespace TileMapper
             {
                 _state = SelectionState.Idle;
             }
+            else if(ImGui.IsMouseDown(ImGuiMouseButton.Right) && _state == SelectionState.Idle)
+            {
+                _placeDragAction = FillSelection(layer, tile);
+
+                _state = SelectionState.Finished;
+            }
         }
 
         // Method to return the bounds of the selection.
@@ -217,7 +214,28 @@ namespace TileMapper
         // Method to paste subarray over layer.
         private MultiplaceEditAction SetSelection(TileLayer layer, int[,] subArray, int x, int y)
         {
-            throw new NotImplementedException();
+            List<PlaceEditAction> singlePlacements = new List<PlaceEditAction>();
+
+            int row;
+            int col;
+
+            for (int i = 0; i < subArray.GetLength(0); i++)
+            {
+                for (int j = 0; j < subArray.GetLength(1); j++)
+                {
+                    row = i + x;
+                    col = j + y;
+
+                    if(subArray[i, j] != -1 && row >= 0 && row < layer.GetRows() && col >= 0 && col < layer.GetCols())
+                    {
+                        singlePlacements.Add(new PlaceEditAction(layer, (uint)row, (uint)col, layer.GetTile((uint)row, (uint)col), subArray[i,j]));
+
+                        layer.SetTile((uint)row, (uint)col, subArray[i, j]);
+                    }
+                }
+            }
+
+            return new MultiplaceEditAction(singlePlacements);
         }
 
         // Public method for pasting.
@@ -239,6 +257,40 @@ namespace TileMapper
                 _selection[1, 0] = 0;
                 _selection[1, 1] = subArray.GetLength(1) - 1;
             }
+        }
+
+        // Method to fill selection with single tile
+        private MultiplaceEditAction FillSelection(TileLayer layer, int tile)
+        {
+            MultiplaceEditAction edit = null;
+
+            if (_selection != null)
+            {
+                List<PlaceEditAction> singlePlacements = new List<PlaceEditAction>();
+
+                int row;
+                int col;
+
+                for (int i = _selection[0, 0]; i <= _selection[0, 1]; i++)
+                {
+                    for (int j = _selection[1, 0]; j <= _selection[1, 1]; j++)
+                    {
+                        row = i;
+                        col = j;
+
+                        if (row >= 0 && row < layer.GetRows() && col >= 0 && col < layer.GetCols())
+                        {
+                            singlePlacements.Add(new PlaceEditAction(layer, (uint)row, (uint)col, layer.GetTile((uint)row, (uint)col), tile));
+
+                            layer.SetTile((uint)row, (uint)col, tile);
+                        }
+                    }
+                }
+
+                edit = new MultiplaceEditAction(singlePlacements);
+            }
+
+            return edit;
         }
     }
 }
