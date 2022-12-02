@@ -34,7 +34,7 @@ namespace TileMapper
             return newEdit;
         }
 
-        // No behavior needed ad no continuous actions.
+        // No behavior needed as no continuous actions.
         public void Interrupt()
         {
             

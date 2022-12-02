@@ -125,7 +125,7 @@ namespace TileMapper.UI
                         if (ImGui.MenuItem("Place")) newAction = new PlaceAction();
                         if (ImGui.MenuItem("Select")) newAction = new SelectAction();
                         if (ImGui.MenuItem("Fill")) newAction = new FillAction();
-                        if (ImGui.MenuItem("Pipet")) newAction = new PipetAction();
+                        if (ImGui.MenuItem("Pipet")) newAction = new PipetAction(_ts);
 
                         if(newAction != null)
                         {

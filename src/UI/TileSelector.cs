@@ -144,6 +144,14 @@ namespace TileMapper.UI
             return _tileSelected;
         }
 
+        public void SetTileSelected(int tile)
+        {
+            if(-1 < tile && tile < _tileList.Length)
+            {
+                _tileSelected = tile;
+            }
+        }
+
         public void ChangeTileSet(TileSet ts)
         {
 
