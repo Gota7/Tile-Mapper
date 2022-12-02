@@ -52,7 +52,7 @@ namespace TileMapper
         }
 
         // Draw a tile to a given position.
-        public void Draw(float x, float y, uint id, float scale = 1.0f)
+        public void Draw(float x, float y, uint id, float scaleX = 1.0f, float scaleY = 1.0f)
         {
 
             // Get source rectange and check if invalid.
@@ -60,7 +60,7 @@ namespace TileMapper
             if (src.x == -1.0f) return;
 
             // Draw otherwise.
-            Raylib.DrawTexturePro(_texture, src, new Rectangle(x, y, TileWidth * scale, TileHeight * scale), System.Numerics.Vector2.Zero, 0.0f, Color.WHITE);
+            Raylib.DrawTexturePro(_texture, src, new Rectangle(x, y, TileWidth * scaleX, TileHeight * scaleY), System.Numerics.Vector2.Zero, 0.0f, Color.WHITE);
 
         }
 

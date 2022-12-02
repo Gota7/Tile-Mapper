@@ -23,7 +23,7 @@ while (!Raylib.WindowShouldClose())
     {
         for (uint j = 0; j < size.Item2; j++)
         {
-            ts.Draw(i * drawnWidth, j * drawnHeight, ts.GetID(i, j), scale);
+            ts.Draw(i * drawnWidth, j * drawnHeight, ts.GetID(i, j), scale, scale);
         }
     }
 
