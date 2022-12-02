@@ -2,6 +2,7 @@
 
 namespace TileMapper
 {
+    // Action to select rectangular area of tiles and drag/drop them.
     internal class SelectAction : MapAction
     {
         public bool CanGenerate()

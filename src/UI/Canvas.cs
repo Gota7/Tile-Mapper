@@ -120,10 +120,24 @@ namespace TileMapper.UI
                     }
                     if (ImGui.BeginMenu("Actions"))
                     {
-                        if (ImGui.MenuItem("Place")) _currentAction = new PlaceAction();
-                        if (ImGui.MenuItem("Select")) _currentAction = new SelectAction();
-                        if (ImGui.MenuItem("Fill")) _currentAction = new FillAction();
-                        if (ImGui.MenuItem("Pipet")) _currentAction = new PipetAction();
+                        MapAction newAction = null;
+
+                        if (ImGui.MenuItem("Place")) newAction = new PlaceAction();
+                        if (ImGui.MenuItem("Select")) newAction = new SelectAction();
+                        if (ImGui.MenuItem("Fill")) newAction = new FillAction();
+                        if (ImGui.MenuItem("Pipet")) newAction = new PipetAction();
+
+                        if(newAction != null)
+                        {
+                            _currentAction.Interrupt();
+
+                            if (_currentAction.CanGenerate())
+                            {
+                                _actionLog.AddAction(_currentAction.GenerateAction());
+                            }
+
+                            _currentAction = newAction;
+                        }
 
                         ImGui.EndMenu();
                     }
