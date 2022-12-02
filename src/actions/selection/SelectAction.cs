@@ -56,7 +56,7 @@ namespace TileMapper
         // Returns the overall edit done by dragging a selection
         public EditAction GenerateAction()
         {
-            MultiplaceEditAction overallAction = null;
+            EditAction overallAction = null;
 
             _state = SelectionState.Idle;
 
@@ -68,7 +68,9 @@ namespace TileMapper
             {
                 // Merge the two actions into one.
 
-                throw new NotImplementedException();
+                EditAction[] sequence = { _removeInitialAction, _placeDragAction};
+
+                overallAction = new SequentialEditAction(sequence);
             }
 
             _removeInitialAction = null;
