@@ -24,7 +24,7 @@ namespace TileMapper
             return _singlePlacements.Count > 0;
         }
 
-        // Returns the ties edited by the fill
+        // Returns the ties edited by the fill.
         public EditAction GenerateAction()
         {
             MultiplaceEditAction newEdit = new MultiplaceEditAction(_singlePlacements);
@@ -67,7 +67,7 @@ namespace TileMapper
 
             layer.SetTile(x, y, tile);
 
-            //Check adjacent tiles.
+            // Check adjacent tiles.
             if(x > 0 && layer.GetTile(x-1, y) == initialTile)
             {
                 FillArea(x-1, y, layer, tile, initialTile);

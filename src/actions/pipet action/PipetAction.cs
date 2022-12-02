@@ -12,7 +12,7 @@ namespace TileMapper
 
         private TileSelector _ts;
 
-        //Constructor
+        // Constructor.
         public PipetAction(TileSelector ts)
         {
             _ts = ts;
@@ -24,7 +24,7 @@ namespace TileMapper
             return false;
         }
 
-        // No actions are generated;
+        // No actions are generated.
         public EditAction GenerateAction()
         {
             return null;
@@ -36,7 +36,7 @@ namespace TileMapper
             
         }
 
-        // If mouse pressed, set the selected tile to the given tile
+        // If mouse pressed, set the selected tile to the given tile.
         public void Update(uint x, uint y, TileLayer layer, int tile)
         {
             if (ImGui.IsMouseDown(ImGuiMouseButton.Left))
