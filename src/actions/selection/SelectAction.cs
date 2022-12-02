@@ -113,7 +113,7 @@ namespace TileMapper
                         if (_state != SelectionState.Pasted)
                         {
                             //Remove initial copy and replaces it.
-                            
+
                             _selectedTiles = GetSelection(layer);
 
                             _removeInitialAction = FillSelection(layer, -1);
@@ -172,11 +172,14 @@ namespace TileMapper
             {
                 _state = SelectionState.Idle;
             }
-            else if(ImGui.IsMouseDown(ImGuiMouseButton.Right) && _state == SelectionState.Idle)
+            else if (ImGui.IsMouseDown(ImGuiMouseButton.Right) && _state == SelectionState.Idle)
             {
                 _placeDragAction = FillSelection(layer, tile);
 
-                _state = SelectionState.Finished;
+                if (_placeDragAction != null)
+                {
+                    _state = SelectionState.Finished;
+                }
             }
         }
 
@@ -280,7 +283,8 @@ namespace TileMapper
                         row = i;
                         col = j;
 
-                        if (row >= 0 && row < layer.GetRows() && col >= 0 && col < layer.GetCols())
+                        if (row >= 0 && row < layer.GetRows() && col >= 0 && col < layer.GetCols()
+                            && layer.GetTile((uint)row, (uint)col) != tile)
                         {
                             singlePlacements.Add(new PlaceEditAction(layer, (uint)row, (uint)col, layer.GetTile((uint)row, (uint)col), tile));
 
@@ -289,7 +293,10 @@ namespace TileMapper
                     }
                 }
 
-                edit = new MultiplaceEditAction(singlePlacements);
+                if (singlePlacements.Count > 0)
+                {
+                    edit = new MultiplaceEditAction(singlePlacements);
+                }
             }
 
             return edit;
