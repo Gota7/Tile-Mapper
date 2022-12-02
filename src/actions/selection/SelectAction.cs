@@ -108,8 +108,6 @@ namespace TileMapper
                         && x >= _selection[0, 0] && x <= _selection[0, 1]
                         && y >= _selection[1, 0] && y <= _selection[1, 1])
                     {
-                        _state = SelectionState.Dragging;
-
                         if (_state != SelectionState.Pasted)
                         {
                             //Remove initial copy and replaces it.
@@ -119,8 +117,10 @@ namespace TileMapper
                             _removeInitialAction = FillSelection(layer, -1);
                             _placeDragAction = SetSelection(layer, _selectedTiles, _selection[0, 0], _selection[1, 0]);
                         }
+
+                        _state = SelectionState.Dragging;
                     }
-                    else
+                    else if (_state != SelectionState.Pasted)
                     {
                         _state = SelectionState.Selecting;
 
@@ -131,6 +131,10 @@ namespace TileMapper
 
                         _selection[1, 0] = (int)y;
                         _selection[1, 1] = (int)y;
+                    }
+                    else
+                    {
+                        _state = SelectionState.Finished;
                     }
                 }
                 else if (_state == SelectionState.Selecting)
@@ -171,6 +175,10 @@ namespace TileMapper
             else if (ImGui.IsMouseDown(ImGuiMouseButton.Right) && (_state == SelectionState.Dragging || _state == SelectionState.Pasted))
             {
                 _state = SelectionState.Finished;
+            }
+            else if (_state == SelectionState.Dragging)
+            {
+                _state = SelectionState.Pasted;
             }
             else if (ImGui.IsMouseDown(ImGuiMouseButton.Right) && _state == SelectionState.Idle)
             {
