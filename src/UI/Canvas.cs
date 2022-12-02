@@ -20,6 +20,8 @@ namespace TileMapper.UI
         private MapAction _currentAction;
         private UndoLog _actionLog;
 
+        private int[,] _copiedSubarray;
+
         private int _trueWidth, _trueHeight;
         private float _currentWidth, _currentHeight;
 
@@ -46,7 +48,9 @@ namespace TileMapper.UI
             this._ts = ts;
             ResetSize();
             GetWindowPadding();
+
             _currentAction = new PlaceAction();
+            _copiedSubarray = null;
         }
 
 
@@ -115,6 +119,25 @@ namespace TileMapper.UI
                             }
                             _actionLog.Redo();
                         }
+
+                        if(ImGui.MenuItem("Copy") && _currentAction is SelectAction)
+                        {
+                            _copiedSubarray = ((SelectAction)_currentAction).GetSelection(TileMap.GetCurrentLayer());
+                        }
+                        if(ImGui.MenuItem("Paste") && _copiedSubarray != null)
+                        {
+                            _currentAction.Interrupt();
+
+                            if (_currentAction.CanGenerate())
+                            {
+                                _actionLog.AddAction(_currentAction.GenerateAction());
+                            }
+
+                            SelectAction newAction = new SelectAction();
+                            newAction.Paste(TileMap.GetCurrentLayer(),_copiedSubarray);
+                            _currentAction = newAction;
+                        }
+
                         ImGui.EndMenu();
                     }
                     if (ImGui.BeginMenu("Actions"))
