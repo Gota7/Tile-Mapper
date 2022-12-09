@@ -61,18 +61,10 @@ namespace TileMapper.UI
                     if (ImGui.MenuItem("Open")) OpenFiles();
                     ImGui.EndMenu();
                 }
-                if (ImGui.BeginMenu("Tool"))
-                {
-                    ImGui.EndMenu();
-                }
                 if (ImGui.BeginMenu("View"))
                 {
                     ImGui.Checkbox("Tileset Selector", ref _selectorShown);
                     ImGui.EndMenu();
-                }
-                if (ImGui.MenuItem("About"))
-                {
-                    // TODO!!!
                 }
                 ImGui.EndMainMenuBar();
             }

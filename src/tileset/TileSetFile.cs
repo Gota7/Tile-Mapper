@@ -52,9 +52,10 @@ namespace TileMapper
 
         }
 
-        // Save the tileset to a given path.
-        public void Save(string filePath)
+        // Need to be called externally for asynchronous execution.
+        private void SaveInternal(object data)
         {
+            string filePath = data as string;
 
             // Create binary writer output stream.
             using (FileStream fileOut = new FileStream(filePath, FileMode.Create))
@@ -80,7 +81,13 @@ namespace TileMapper
 
                 }
             }
+        }
 
+        // Save the tileset to a given path.
+        public void Save(string filePath)
+        {
+            Thread thread = new Thread(new ParameterizedThreadStart(SaveInternal));
+            thread.Start(filePath);
         }
 
     }
