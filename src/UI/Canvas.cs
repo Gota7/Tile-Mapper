@@ -93,6 +93,7 @@ namespace TileMapper.UI
                         if (ImGui.MenuItem("Save")) Save();
                         if (ImGui.MenuItem("Save As")) SaveAs();
                         if (ImGui.MenuItem("Close")) Close();
+                        if (ImGui.MenuItem("Delete")) Delete();
 
                         ImGui.EndMenu();
                     }
@@ -144,10 +145,10 @@ namespace TileMapper.UI
                     {
                         MapAction newAction = null;
 
-                        if (ImGui.MenuItem("Place")) newAction = new PlaceAction();
-                        if (ImGui.MenuItem("Select")) newAction = new SelectAction();
-                        if (ImGui.MenuItem("Fill")) newAction = new FillAction();
-                        if (ImGui.MenuItem("Pipet")) newAction = new PipetAction(_ts);
+                        if (ImGui.RadioButton("Place", _currentAction is PlaceAction)) newAction = new PlaceAction();
+                        if (ImGui.RadioButton("Select", _currentAction is SelectAction)) newAction = new SelectAction();
+                        if (ImGui.RadioButton("Fill", _currentAction is FillAction)) newAction = new FillAction();
+                        if (ImGui.RadioButton("Pipet", _currentAction is PipetAction)) newAction = new PipetAction(_ts);
 
                         if(newAction != null)
                         {
@@ -176,13 +177,13 @@ namespace TileMapper.UI
                                     if (TileMap.TileWidth == 0) TileMap.TileWidth = 1; // Divide by 0 error otherwise.
                                     ResetSize();
                                 }
-                            //rlImGui.Tooltip("Width of each tile in pixels.");
+                            rlImGui.Tooltip("Width of each tile in pixels.");
                             fixed (ushort* ptr = &TileMap.TileHeight) if (ImGui.InputScalar("Tile Height", ImGuiDataType.U16, (nint)ptr))
                                 {
                                     if (TileMap.TileHeight == 0) TileMap.TileHeight = 1; // Divide by 0 error otherwise.
                                     ResetSize();
                                 }
-                            //rlImGui.Tooltip("Height of each tile in pixels.");
+                            rlImGui.Tooltip("Height of each tile in pixels.");
                             fixed (ushort* ptr = &_resizeX) if (ImGui.InputScalar("Width", ImGuiDataType.U16, (nint)ptr))
                                     if (_resizeX == 0) _resizeX = 1;
                             fixed (ushort* ptr = &_resizeY) if (ImGui.InputScalar("Height", ImGuiDataType.U16, (nint)ptr))
@@ -192,7 +193,7 @@ namespace TileMapper.UI
                                 TileMap.Resize(_resizeX, _resizeY);
                                 ResetSize();
                             }
-                            //rlImGui.Tooltip("Resize the tile map.");
+                            rlImGui.Tooltip("Resize the tile map to the new width and height provided.");
                             ImGui.EndTabItem();
                         }
 
@@ -401,6 +402,13 @@ namespace TileMapper.UI
                     _fd = null;
                 } else if (!_fd.Open) _fd = null;
             }
+        }
+
+        // Delete the map.
+        public void Delete()
+        {
+            if (File.Exists(TileMap.Path)) File.Delete(TileMap.Path);
+            Close();
         }
 
     }

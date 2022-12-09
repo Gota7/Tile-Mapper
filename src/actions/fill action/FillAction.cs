@@ -12,7 +12,7 @@ namespace TileMapper
 
         private List<PlaceEditAction> _singlePlacements;
 
-        // Constructor
+        // Constructor.
         public FillAction()
         {
             _singlePlacements = new List<PlaceEditAction>();
@@ -37,7 +37,6 @@ namespace TileMapper
         // No behavior needed as no continuous actions.
         public void Interrupt()
         {
-            
         }
 
         // Uses depth-first search to determine area to fill.

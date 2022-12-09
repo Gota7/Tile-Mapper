@@ -202,8 +202,8 @@ namespace TileMapper
             this.Save();
         }
 
-        // Method to save to stored file path.
-        public void Save()
+        // To be called asynchronously.
+        private void SaveInternal()
         {
             using (FileStream fileOut = new FileStream(_filePath, FileMode.Create))
             {
@@ -230,6 +230,13 @@ namespace TileMapper
                     }
                 }
             }
+        }
+
+        // Method to save to stored file path.
+        public void Save()
+        {
+            Thread thread = new Thread(SaveInternal);
+            thread.Start();
         }
 
         public void AddTileSet(TileSet ts)

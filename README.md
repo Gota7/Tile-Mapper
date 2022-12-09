@@ -1,5 +1,5 @@
 # Tile-Mapper
-Utility for mapping tiles.
+Utility for mapping tiles. Messy college product. See the [wiki](https://github.com/Gota7/Tile-Mapper/wiki) for details.
 
 ## Coding Style
 See the [Microsoft C# Coding Conventions](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions).
